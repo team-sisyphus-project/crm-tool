@@ -355,15 +355,33 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
   },
 ];
 
+/**
+ * Required environment variables the Supabase provider needs to connect.
+ * Validation lives here (before provider construction) rather than inside
+ * getDataProvider, so a missing value surfaces a config-guidance screen
+ * instead of throwing at render time.
+ */
+export const REQUIRED_SUPABASE_ENV = [
+  "VITE_SUPABASE_URL",
+  "VITE_SB_PUBLISHABLE_KEY",
+] as const;
+
+/**
+ * Returns the names of the required Supabase env vars that are missing
+ * (unset or empty). An empty array means the provider can be built safely.
+ */
+export const getMissingSupabaseEnv = (): string[] => {
+  const missing: string[] = [];
+  if (!import.meta.env.VITE_SUPABASE_URL) {
+    missing.push("VITE_SUPABASE_URL");
+  }
+  if (!import.meta.env.VITE_SB_PUBLISHABLE_KEY) {
+    missing.push("VITE_SB_PUBLISHABLE_KEY");
+  }
+  return missing;
+};
+
 export const getDataProvider = () => {
-  if (import.meta.env.VITE_SUPABASE_URL === undefined) {
-    throw new Error("Please set the VITE_SUPABASE_URL environment variable");
-  }
-  if (import.meta.env.VITE_SB_PUBLISHABLE_KEY === undefined) {
-    throw new Error(
-      "Please set the VITE_SB_PUBLISHABLE_KEY environment variable",
-    );
-  }
   return withLifecycleCallbacks(
     getDataProviderWithCustomMethods(),
     lifeCycleCallbacks,
