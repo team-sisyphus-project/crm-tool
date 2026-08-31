@@ -1,11 +1,11 @@
 import { render } from "vitest-browser-react";
 
-import { ConfigurationRequired } from "./ConfigurationRequired";
 import { CRM } from "./CRM";
 import { getMissingSupabaseEnv } from "../providers/supabase";
 
 const URL_ENV = "VITE_SUPABASE_URL";
 const KEY_ENV = "VITE_SB_PUBLISHABLE_KEY";
+const DEMO_ENV = "VITE_IS_DEMO";
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -41,31 +41,25 @@ describe("getMissingSupabaseEnv", () => {
   });
 });
 
-describe("ConfigurationRequired", () => {
-  it("names each missing variable and how to fix it", async () => {
-    const screen = await render(
-      <ConfigurationRequired missingEnv={[URL_ENV, KEY_ENV]} />,
-    );
-
-    await expect
-      .element(screen.getByRole("heading", { name: "Configuration required" }))
-      .toBeVisible();
-    await expect.element(screen.getByText(URL_ENV)).toBeVisible();
-    await expect.element(screen.getByText(KEY_ENV)).toBeVisible();
-    await expect.element(screen.getByText(/\.env/)).toBeVisible();
-  });
-});
-
-describe("CRM configuration guard", () => {
-  it("renders the guidance screen when a required var is unset", async () => {
+describe("CRM demo-mode fallback", () => {
+  it("mounts the app with a mock-data banner when a required var is unset", async () => {
     vi.stubEnv(URL_ENV, "https://example.supabase.co");
     vi.stubEnv(KEY_ENV, "");
 
     const screen = await render(<CRM />);
 
-    await expect
-      .element(screen.getByRole("heading", { name: "Configuration required" }))
-      .toBeVisible();
-    await expect.element(screen.getByText(KEY_ENV)).toBeVisible();
+    await expect.element(screen.getByRole("status")).toBeVisible();
+    await expect.element(screen.getByText(/Demo mode/)).toBeVisible();
+  });
+
+  it("mounts the app with a mock-data banner when demo mode is forced", async () => {
+    vi.stubEnv(URL_ENV, "https://example.supabase.co");
+    vi.stubEnv(KEY_ENV, "publishable-key");
+    vi.stubEnv(DEMO_ENV, "true");
+
+    const screen = await render(<CRM />);
+
+    await expect.element(screen.getByRole("status")).toBeVisible();
+    await expect.element(screen.getByText(/Demo mode/)).toBeVisible();
   });
 });

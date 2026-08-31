@@ -4,7 +4,12 @@ import type {
   DashboardComponent,
   LayoutComponent,
 } from "ra-core";
-import { CustomRoutes, localStorageStore, Resource } from "ra-core";
+import {
+  CustomRoutes,
+  localStorageStore,
+  memoryStore,
+  Resource,
+} from "ra-core";
 import { useEffect, useMemo } from "react";
 import { Route } from "react-router";
 import { QueryClient } from "@tanstack/react-query";
@@ -31,7 +36,11 @@ import {
   getDataProvider as defaultDataProviderBuilder,
   getMissingSupabaseEnv,
 } from "../providers/supabase";
-import { ConfigurationRequired } from "./ConfigurationRequired";
+import {
+  authProvider as fakeRestAuthProvider,
+  dataProvider as fakeRestDataProvider,
+} from "../providers/fakerest";
+import { DemoModeBanner } from "./DemoModeBanner";
 import sales from "../sales";
 import { SettingsPageMobile } from "../settings/SettingsPageMobile";
 import { ProfilePage } from "../settings/ProfilePage";
@@ -63,6 +72,11 @@ import { CompanyShow } from "../companies/CompanyShow.tsx";
 import { NoteShowPage } from "../notes/NoteShowPage.tsx";
 
 const defaultStore = localStorageStore(undefined, "CRM");
+
+// Demo mode uses an ephemeral in-memory store so nothing leaks into
+// localStorage across preview sessions. Created once at module scope to keep a
+// stable reference across CRM re-renders.
+const demoStore = memoryStore();
 
 export type CRMProps = {
   dataProvider?: CrmDataProvider;
@@ -117,18 +131,36 @@ export type CRMProps = {
  * export default App;
  */
 /**
- * Public CRM entry point. When no data provider is supplied, it verifies the
- * required Supabase environment variables are present before building the
- * provider. If any are missing, it renders a configuration-guidance screen
- * instead of letting provider construction throw and blank the page.
+ * Public CRM entry point. When no data provider is supplied, it decides whether
+ * to talk to Supabase or fall back to the in-browser FakeRest demo provider.
+ *
+ * The fallback triggers when the required Supabase env vars are missing (which
+ * would otherwise make provider construction throw and blank the page) or when
+ * demo mode is explicitly forced via `VITE_IS_DEMO`. In that case the app still
+ * mounts — on mock data — and a banner makes the mock-data mode explicit.
+ *
+ * A caller-supplied `dataProvider` always wins and bypasses the fallback.
  */
 export const CRM = (props: CRMProps) => {
-  // A caller-supplied data provider bypasses the Supabase env requirement
-  // (e.g. the FakeRest demo provider), so only validate when none is given.
-  const missingEnv = props.dataProvider ? [] : getMissingSupabaseEnv();
-  if (missingEnv.length > 0) {
-    return <ConfigurationRequired missingEnv={missingEnv} />;
+  const shouldUseDemoFallback =
+    !props.dataProvider &&
+    (getMissingSupabaseEnv().length > 0 ||
+      import.meta.env.VITE_IS_DEMO === "true");
+
+  if (shouldUseDemoFallback) {
+    return (
+      <>
+        <DemoModeBanner />
+        <CRMApp
+          {...props}
+          dataProvider={fakeRestDataProvider}
+          authProvider={fakeRestAuthProvider}
+          store={demoStore}
+        />
+      </>
+    );
   }
+
   return <CRMApp {...props} />;
 };
 
