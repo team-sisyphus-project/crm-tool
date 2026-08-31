@@ -13,6 +13,7 @@
     "build:demo": "tsc && vite build --config vite.demo.config",
     "typecheck": "tsc --noEmit --project tsconfig.app.json",
     "preview": "vite preview",
+    "preview:demo": "npm run build:demo && vite preview",
     "lint:apply": "eslint **/*.{mjs,ts,tsx} --fix",
     "lint": "eslint **/*.{mjs,ts,tsx}",
     "prettier:apply": "prettier --config ./.prettierrc.json --write --list-different \"**/*.{mjs,js,json,ts,tsx,css,md,html}\"",
