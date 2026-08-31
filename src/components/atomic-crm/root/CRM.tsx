@@ -29,7 +29,9 @@ import { ChangelogPage } from "../misc/ChangelogPage";
 import {
   getAuthProvider as defaultAuthProviderBuilder,
   getDataProvider as defaultDataProviderBuilder,
+  getMissingSupabaseEnv,
 } from "../providers/supabase";
+import { ConfigurationRequired } from "./ConfigurationRequired";
 import sales from "../sales";
 import { SettingsPageMobile } from "../settings/SettingsPageMobile";
 import { ProfilePage } from "../settings/ProfilePage";
@@ -114,7 +116,23 @@ export type CRMProps = {
  *
  * export default App;
  */
-export const CRM = ({
+/**
+ * Public CRM entry point. When no data provider is supplied, it verifies the
+ * required Supabase environment variables are present before building the
+ * provider. If any are missing, it renders a configuration-guidance screen
+ * instead of letting provider construction throw and blank the page.
+ */
+export const CRM = (props: CRMProps) => {
+  // A caller-supplied data provider bypasses the Supabase env requirement
+  // (e.g. the FakeRest demo provider), so only validate when none is given.
+  const missingEnv = props.dataProvider ? [] : getMissingSupabaseEnv();
+  if (missingEnv.length > 0) {
+    return <ConfigurationRequired missingEnv={missingEnv} />;
+  }
+  return <CRMApp {...props} />;
+};
+
+const CRMApp = ({
   companySectors = defaultCompanySectors,
   currency = defaultCurrency,
   dealCategories = defaultDealCategories,
