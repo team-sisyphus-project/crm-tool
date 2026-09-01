@@ -190,7 +190,7 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/root/ConfigurationRequired.tsx",
+          "path": "src/components/atomic-crm/root/DemoModeBanner.tsx",
           "type": "registry:component"
         },
         {
