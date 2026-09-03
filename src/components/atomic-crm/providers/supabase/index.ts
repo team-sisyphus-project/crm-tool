@@ -1,2 +1,2 @@
 export { getAuthProvider } from "./authProvider";
-export { getDataProvider } from "./dataProvider";
+export { getDataProvider, getMissingSupabaseEnv } from "./dataProvider";

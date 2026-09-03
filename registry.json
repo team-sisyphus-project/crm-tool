@@ -190,6 +190,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/root/DemoModeBanner.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/root/ConfigurationContext.tsx",
           "type": "registry:component"
         },
@@ -479,6 +483,10 @@
         },
         {
           "path": "src/components/atomic-crm/misc/ActiveFilterButton.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/login/authConfig.ts",
           "type": "registry:component"
         },
         {
