@@ -2,6 +2,7 @@ import { datatype, lorem, random } from "faker/locale/en_US";
 
 import { defaultNoteStatuses } from "../../../root/defaultConfiguration";
 import type { ContactNote } from "../../../types";
+import { generateNextAction } from "./nextAction";
 import type { Db } from "./types";
 import { randomDate } from "./utils";
 
@@ -20,6 +21,7 @@ export const generateContactNotes = (db: Db): ContactNote[] => {
       date: date.toISOString(),
       sales_id: contact.sales_id!,
       status: random.arrayElement(defaultNoteStatuses).value,
+      ...generateNextAction(date),
     };
   });
 };

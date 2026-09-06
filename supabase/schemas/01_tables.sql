@@ -59,7 +59,9 @@ create table public.contact_notes (
     date timestamp with time zone default now(),
     sales_id bigint,
     status text,
-    attachments jsonb[]
+    attachments jsonb[],
+    next_action text,
+    next_action_date timestamp with time zone
 );
 
 create table public.deals (
@@ -86,7 +88,9 @@ create table public.deal_notes (
     text text,
     date timestamp with time zone default now(),
     sales_id bigint,
-    attachments jsonb[]
+    attachments jsonb[],
+    next_action text,
+    next_action_date timestamp with time zone
 );
 
 create table public.sales (

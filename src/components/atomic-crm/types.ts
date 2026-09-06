@@ -109,6 +109,10 @@ export type ContactNote = {
   sales_id: Identifier;
   status: string;
   attachments?: AttachmentNote[];
+  /** What the sales rep committed to do next after this activity. */
+  next_action?: string | null;
+  /** When the next action is due. Null whenever `next_action` is null. */
+  next_action_date?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type Deal = {
@@ -133,6 +137,10 @@ export type DealNote = {
   date: string;
   sales_id: Identifier;
   attachments?: AttachmentNote[];
+  /** What the sales rep committed to do next after this activity. */
+  next_action?: string | null;
+  /** When the next action is due. Null whenever `next_action` is null. */
+  next_action_date?: string | null;
 
   // This is defined for compatibility with `ContactNote`
   status?: undefined;
