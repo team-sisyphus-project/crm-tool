@@ -1,0 +1,23 @@
+# Local preview contract for this repository.
+#
+# Auto-detection is ambiguous here: the repo holds two Vite configs (real
+# backend + demo) and a hand-written Node server, so the build command and the
+# run command are both non-standard. This file pins them.
+#
+# `build:demo` is the preview build on purpose: it inlines its own Supabase
+# placeholders and forces VITE_IS_DEMO=true, so a clean checkout renders the
+# CRM on in-browser fake data instead of the "configuration required" screen
+# when no backend is wired up. Point the preview at a real Supabase instance by
+# exporting VITE_SUPABASE_URL / VITE_SB_PUBLISHABLE_KEY before the build.
+#
+# The server is plain HTTP (TLS is terminated upstream), binds $PORT, and
+# serves the static build output from `dist/` — one process, one port.
+
+model = "server"
+
+[build]
+command = "npm run build:demo"
+
+[serve]
+command  = "node server.mjs"
+port_env = "PORT"
