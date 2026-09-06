@@ -18,6 +18,7 @@ import { MobileBackButton } from "../misc/MobileBackButton";
 import { RelativeDate } from "../misc/RelativeDate";
 import { Status } from "../misc/Status";
 import type { ContactNote } from "../types";
+import { NextActionSummary } from "./NextActionSummary";
 import { NoteAttachments } from "./NoteAttachments";
 import { NoteEditSheet } from "./NoteEditSheet";
 import { useGetSalesName } from "../sales/useGetSalesName";
@@ -99,6 +100,11 @@ export const NoteShowPage = () => {
         </div>
 
         {note.text && <Markdown className="text-sm">{note.text}</Markdown>}
+
+        {/* The mobile activity log links here, so the follow-up the note
+            committed to has to survive the drill-down. Same component, same
+            position as the desktop note, so both read identically. */}
+        <NextActionSummary note={note} />
 
         {note.attachments && (
           <div className="mt-4">
