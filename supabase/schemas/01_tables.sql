@@ -29,7 +29,8 @@ create table public.companies (
     description text,
     revenue text,
     tax_identifier text,
-    logo jsonb
+    logo jsonb,
+    campaign text
 );
 
 create table public.contacts (
@@ -49,7 +50,8 @@ create table public.contacts (
     sales_id bigint,
     linkedin_url text,
     email_jsonb jsonb,
-    phone_jsonb jsonb
+    phone_jsonb jsonb,
+    campaign text
 );
 
 create table public.contact_notes (

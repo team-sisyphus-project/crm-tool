@@ -131,6 +131,7 @@ export const mergeContacts = async (
           ? winnerContact.last_seen
           : loserContact.last_seen,
       sales_id: winnerContact.sales_id ?? loserContact.sales_id,
+      campaign: winnerContact.campaign ?? loserContact.campaign,
       tags: mergeArraysUnique(
         winnerContact.tags || [],
         loserContact.tags || [],

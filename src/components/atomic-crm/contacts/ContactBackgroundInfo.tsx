@@ -6,6 +6,7 @@ import {
   WithRecord,
 } from "ra-core";
 import { TextField } from "@/components/admin/text-field";
+import { AsideInfoRow } from "../misc/AsideInfoRow";
 import { formatLocalizedDate } from "../misc/RelativeDate";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { Contact } from "../types";
@@ -38,6 +39,14 @@ export const ContactBackgroundInfo = () => {
           ) : null
         }
       />
+      <div className="md:py-0.5">
+        <AsideInfoRow
+          label={translate("resources.contacts.fields.campaign")}
+          value={record.campaign}
+          emptyText={translate("crm.common.no_campaign")}
+        />
+      </div>
+
       <div className="text-muted-foreground md:py-0.5">
         <span className="text-sm">
           {translate("resources.contacts.background.added_on", {

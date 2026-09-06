@@ -118,6 +118,7 @@ const CompanyContextInputs = () => {
       <SelectInput source="size" choices={translatedSizes} helperText={false} />
       <TextInput source="revenue" helperText={false} />
       <TextInput source="tax_identifier" helperText={false} />
+      <TextInput source="campaign" helperText={false} />
     </div>
   );
 };

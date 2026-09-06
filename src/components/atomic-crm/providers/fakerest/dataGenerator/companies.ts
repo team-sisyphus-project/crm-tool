@@ -8,12 +8,19 @@ import {
   random,
 } from "faker/locale/en_US";
 
-import { randomDate } from "./utils";
+import { randomDate, weightedBoolean } from "./utils";
 import { defaultCompanySectors } from "../../../root/defaultConfiguration";
 import type { Company, RAFile } from "../../../types";
 import type { Db } from "./types";
 
 const sizes = [1, 10, 50, 250, 500];
+
+const campaigns = [
+  "Spring Outreach",
+  "Summer Product Launch",
+  "Fall Webinar Series",
+  "Year-End Renewal",
+];
 
 const regex = /\W+/;
 
@@ -48,6 +55,8 @@ export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
       tax_identifier: random.alphaNumeric(10),
       country: random.arrayElement(["USA", "France", "UK"]),
       context_links: [],
+      // Two thirds of the records stay unassigned, to exercise the empty state.
+      campaign: weightedBoolean(33) ? random.arrayElement(campaigns) : null,
     };
   });
 };

@@ -13,6 +13,7 @@ import { UrlField } from "@/components/admin/url-field";
 import { SelectField } from "@/components/admin/select-field";
 
 import { formatLocalizedDate } from "../misc/RelativeDate";
+import { AsideInfoRow } from "../misc/AsideInfoRow";
 import { AsideSection } from "../misc/AsideSection";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Company } from "../types";
@@ -147,6 +148,11 @@ export const ContextInfo = ({ record }: { record: Company }) => {
           : <TextField source="tax_identifier" />
         </span>
       )}
+      <AsideInfoRow
+        label={translate("resources.companies.fields.campaign")}
+        value={record.campaign}
+        emptyText={translate("crm.common.no_campaign")}
+      />
     </AsideSection>
   );
 };

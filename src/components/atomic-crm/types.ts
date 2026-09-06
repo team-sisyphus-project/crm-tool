@@ -67,6 +67,7 @@ export type Company = {
   tax_identifier: string;
   country: string;
   context_links?: string[];
+  campaign?: string | null;
   nb_contacts?: number;
   nb_deals?: number;
 } & Pick<RaRecord, "id">;
@@ -98,6 +99,7 @@ export type Contact = {
   status: string;
   background: string;
   phone_jsonb: PhoneNumberAndType[];
+  campaign?: string | null;
   nb_tasks?: number;
   company_name?: string;
 } & Pick<RaRecord, "id">;

@@ -21,6 +21,7 @@ export const englishCrmMessages = {
         country: "Country",
         description: "Description",
         context_links: "Context links",
+        campaign: "Associated campaign",
         sales_id: "Account manager",
       },
       empty: {
@@ -84,6 +85,7 @@ export const englishCrmMessages = {
         linkedin_url: "LinkedIn URL",
         background: "Background info (bio, how you met, etc)",
         has_newsletter: "Has newsletter",
+        campaign: "Associated campaign",
         sales_id: "Account manager",
       },
       action: {
@@ -404,6 +406,7 @@ export const englishCrmMessages = {
       copy: "Copy",
       loading: "Loading...",
       me: "Me",
+      no_campaign: "No associated campaign",
       task_count: "%{smart_count} task |||| %{smart_count} tasks",
     },
     changelog: {

@@ -7,7 +7,7 @@ import { Notification } from "@/components/admin/notification";
 import { createDataProvider } from "@/components/atomic-crm/providers/fakerest";
 import { DEFAULT_USER } from "@/components/atomic-crm/providers/fakerest/authProvider";
 import type { Db } from "@/components/atomic-crm/providers/fakerest/dataGenerator/types";
-import type { Contact, Sale } from "@/components/atomic-crm/types";
+import type { Company, Contact, Sale } from "@/components/atomic-crm/types";
 import { CRM } from "@/components/atomic-crm/root/CRM";
 import { testI18nProvider } from "@/components/atomic-crm/providers/commons/i18nProvider";
 
@@ -72,6 +72,33 @@ export const buildContact = (overrides: Partial<Contact> = {}): Contact => ({
   status: "warm",
   tags: [],
   title: "CTO",
+  ...overrides,
+});
+
+// Build a valid company record with sensible defaults, mirroring buildContact.
+export const buildCompany = (overrides: Partial<Company> = {}): Company => ({
+  address: "1 Analytical Engine Way",
+  campaign: null,
+  city: "London",
+  context_links: [],
+  country: "UK",
+  created_at: "2025-01-01T09:00:00.000Z",
+  description: "",
+  id: 1,
+  linkedin_url: "",
+  logo: { src: "", title: "" } as Company["logo"],
+  name: "Analytical Engines",
+  nb_contacts: 0,
+  nb_deals: 0,
+  phone_number: "",
+  revenue: "$1M",
+  sales_id: 0,
+  sector: "Technology",
+  size: 10,
+  state_abbr: "",
+  tax_identifier: "",
+  website: "",
+  zipcode: "NW1",
   ...overrides,
 });
 

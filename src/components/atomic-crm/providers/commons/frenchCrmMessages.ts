@@ -23,6 +23,7 @@ export const frenchCrmMessages = {
         country: "Pays",
         description: "Description",
         context_links: "URLs de contexte",
+        campaign: "Campagne associée",
         sales_id: "Responsable de compte",
       },
       empty: {
@@ -87,6 +88,7 @@ export const frenchCrmMessages = {
         linkedin_url: "URL LinkedIn",
         background: "Informations de contexte",
         has_newsletter: "Abonné à la newsletter",
+        campaign: "Campagne associée",
         sales_id: "Responsable de compte",
       },
       action: {
@@ -411,6 +413,7 @@ export const frenchCrmMessages = {
       copy: "Copier",
       loading: "Chargement...",
       me: "Moi",
+      no_campaign: "Aucune campagne associée",
     },
     changelog: {
       title: "Notes de version",

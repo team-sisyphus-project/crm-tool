@@ -415,6 +415,7 @@ BEGIN
     first_seen = LEAST(COALESCE(winner_contact.first_seen, loser_contact.first_seen), COALESCE(loser_contact.first_seen, winner_contact.first_seen)),
     last_seen = GREATEST(COALESCE(winner_contact.last_seen, loser_contact.last_seen), COALESCE(loser_contact.last_seen, winner_contact.last_seen)),
     sales_id = COALESCE(winner_contact.sales_id, loser_contact.sales_id),
+    campaign = COALESCE(winner_contact.campaign, loser_contact.campaign),
     tags = merged_tags
   WHERE id = winner_id;
 
