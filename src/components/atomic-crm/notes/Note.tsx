@@ -1,4 +1,4 @@
-import { CircleX, Edit, Save, Trash2 } from "lucide-react";
+import { ArrowRight, CircleX, Edit, Save, Trash2 } from "lucide-react";
 import {
   Form,
   useDelete,
@@ -210,6 +210,21 @@ export const Note = ({
                 ? translate("crm.common.show_less")
                 : translate("crm.common.read_more")}
             </button>
+          )}
+
+          {note.next_action && (
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 text-sm">
+              <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground">
+                {translate("resources.notes.fields.next_action")}
+              </span>
+              <span className="font-medium">{note.next_action}</span>
+              {note.next_action_date && (
+                <span className="text-muted-foreground">
+                  <RelativeDate date={note.next_action_date} />
+                </span>
+              )}
+            </div>
           )}
 
           {note.attachments && <NoteAttachments note={note} />}

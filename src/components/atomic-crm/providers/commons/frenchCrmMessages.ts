@@ -248,6 +248,8 @@ export const frenchCrmMessages = {
         attachments: "Pièces jointes",
         contact_id: "Contact",
         deal_id: "Affaire",
+        next_action: "Prochaine action",
+        next_action_date: "Échéance",
       },
       action: {
         add: "Ajouter une note",
@@ -286,6 +288,8 @@ export const frenchCrmMessages = {
       },
       validation: {
         note_or_attachment_required: "Une note ou une pièce jointe est requise",
+        next_action_required_with_date:
+          "Décrivez la prochaine action, ou effacez son échéance",
       },
     },
     sales: {

@@ -111,6 +111,72 @@ describe("NoteInputs", () => {
     await expect(dateInput).toHaveValue("2024-01-01T12:00");
   });
 
+  it("reveals the next action inputs in the extra options section", async () => {
+    const screen = await render(<Default />);
+
+    await screen.getByRole("button", { name: "Show options" }).click();
+
+    await expect.element(screen.getByLabelText("Next action")).toBeVisible();
+    await expect.element(screen.getByLabelText("Deadline")).toBeVisible();
+  });
+
+  it("displays the next action of an existing note", async () => {
+    const screen = await render(
+      <NoteInputsStory
+        defaultValues={{
+          next_action: "Send the proposal",
+          next_action_date: "2024-01-08T09:00",
+        }}
+      />,
+    );
+
+    await screen.getByRole("button", { name: "Show options" }).click();
+
+    await expect(screen.getByLabelText("Next action")).toHaveValue(
+      "Send the proposal",
+    );
+    await expect(screen.getByLabelText("Deadline")).toHaveValue(
+      "2024-01-08T09:00",
+    );
+  });
+
+  it("submits the next action entered by the user", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(<NoteInputsStory onSubmit={onSubmit} />);
+
+    await screen.getByPlaceholder("Add a note").fill("Call summary");
+    await screen.getByRole("button", { name: "Show options" }).click();
+    await screen.getByLabelText("Next action").fill("Send the proposal");
+    await screen.getByRole("button", { name: "Save" }).click();
+
+    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      text: "Call summary",
+      next_action: "Send the proposal",
+    });
+  });
+
+  it("rejects a deadline without a next action", async () => {
+    const screen = await render(
+      <NoteInputsStory
+        withSaveButton
+        defaultValues={{
+          text: "Call summary",
+          next_action_date: "2024-01-08T09:00",
+        }}
+      />,
+    );
+
+    await screen.getByRole("button", { name: "Show options" }).click();
+    await screen.getByRole("button", { name: "Save" }).click();
+
+    await expect
+      .element(
+        screen.getByText("Describe the next action, or clear its deadline"),
+      )
+      .toBeVisible();
+  });
+
   it("shows a validation error when submitting an empty note without attachments", async () => {
     const screen = await render(<WithSaveButton />);
 

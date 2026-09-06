@@ -8,13 +8,18 @@ import {
   RecordContextProvider,
 } from "ra-core";
 import { AutocompleteInput, ReferenceInput } from "@/components/admin";
+import { DateTimeInput } from "@/components/admin/date-time-input";
 import { FileInputPreview } from "@/components/admin/file-input";
+import { TextInput } from "@/components/admin/text-input";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { contactOptionText } from "../misc/ContactOption";
 import { AttachmentField } from "./AttachmentField";
 import { foreignKeyMapping } from "./foreignKeyMapping";
-import { validateNoteOrAttachmentRequired } from "./noteModel";
+import {
+  validateNextActionDateRequiresText,
+  validateNoteOrAttachmentRequired,
+} from "./noteModel";
 import type { ContactNote } from "../types";
 
 export const NoteInputsMobile = ({
@@ -73,6 +78,20 @@ export const NoteInputsMobile = ({
           </ReferenceInput>
         </div>
       )}
+      <div className="px-4 space-y-4">
+        <TextInput
+          source="next_action"
+          label="resources.notes.fields.next_action"
+          helperText={false}
+        />
+        <DateTimeInput
+          source="next_action_date"
+          label="resources.notes.fields.next_action_date"
+          helperText={false}
+          className="text-primary"
+          validate={validateNextActionDateRequiresText}
+        />
+      </div>
       <div className="px-4">
         <AttachmentPreviewsMobile />
         <AttachButton />

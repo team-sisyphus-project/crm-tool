@@ -10,3 +10,21 @@ export const validateNoteOrAttachmentRequired = (
     ? undefined
     : "resources.notes.validation.note_or_attachment_required";
 };
+
+/**
+ * A next action date is only meaningful next to the action it refers to:
+ * a date alone would be stored but never rendered.
+ */
+export const validateNextActionDateRequiresText = (
+  value: string | null | undefined,
+  values: { next_action?: string | null },
+) => {
+  const hasDate = typeof value === "string" && value.length > 0;
+  const hasNextAction =
+    typeof values?.next_action === "string" &&
+    values.next_action.trim().length > 0;
+
+  return hasDate && !hasNextAction
+    ? "resources.notes.validation.next_action_required_with_date"
+    : undefined;
+};

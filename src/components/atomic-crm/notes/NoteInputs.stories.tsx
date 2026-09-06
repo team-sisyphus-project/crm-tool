@@ -8,17 +8,23 @@ import { StoryWrapper } from "@/test/StoryWrapper";
 type NoteInputsStoryProps = React.ComponentProps<typeof NoteInputs> & {
   defaultValues?: Record<string, unknown>;
   withSaveButton?: boolean;
+  onSubmit?: (values: Record<string, unknown>) => void;
 };
 
 export const NoteInputsStory = ({
   defaultValues,
   withSaveButton = false,
+  onSubmit,
   ...props
 }: NoteInputsStoryProps) => (
   <StoryWrapper>
-    <Form defaultValues={defaultValues}>
+    <Form defaultValues={defaultValues} onSubmit={onSubmit}>
       <NoteInputs {...props} />
-      {withSaveButton ? <SaveButton type="button" /> : null}
+      {/* A "submit" button goes through the Form onSubmit prop, a "button" one
+          only runs validation — the stories need both. */}
+      {withSaveButton || onSubmit ? (
+        <SaveButton type={onSubmit ? "submit" : "button"} />
+      ) : null}
     </Form>
   </StoryWrapper>
 );

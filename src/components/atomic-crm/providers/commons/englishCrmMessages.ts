@@ -243,6 +243,8 @@ export const englishCrmMessages = {
         attachments: "Attachments",
         contact_id: "Contact",
         deal_id: "Deal",
+        next_action: "Next action",
+        next_action_date: "Deadline",
       },
       action: {
         add: "Add note",
@@ -281,6 +283,8 @@ export const englishCrmMessages = {
       },
       validation: {
         note_or_attachment_required: "A note or an attachment is required",
+        next_action_required_with_date:
+          "Describe the next action, or clear its deadline",
       },
     },
     sales: {

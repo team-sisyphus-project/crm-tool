@@ -16,7 +16,10 @@ import { AttachmentField } from "./AttachmentField";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { AutocompleteInput, ReferenceInput } from "@/components/admin";
 import { contactOptionText } from "../misc/ContactOption";
-import { validateNoteOrAttachmentRequired } from "./noteModel";
+import {
+  validateNextActionDateRequiresText,
+  validateNoteOrAttachmentRequired,
+} from "./noteModel";
 
 export const NoteInputs = ({
   defaultStatus,
@@ -177,6 +180,20 @@ export const NoteInputs = ({
             helperText={false}
             className="text-primary"
             defaultValue={getCurrentDate()}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TextInput
+            source="next_action"
+            label="resources.notes.fields.next_action"
+            helperText={false}
+          />
+          <DateTimeInput
+            source="next_action_date"
+            label="resources.notes.fields.next_action_date"
+            helperText={false}
+            className="text-primary"
+            validate={validateNextActionDateRequiresText}
           />
         </div>
         <FileInput
