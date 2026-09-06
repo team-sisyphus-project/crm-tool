@@ -3,18 +3,21 @@ import {
   ListContextProvider,
   RecordContextProvider,
   ResourceContextProvider,
+  useGetOne,
   type ListControllerResult,
 } from "ra-core";
 
 import { StoryWrapper, buildContact } from "@/test/StoryWrapper";
 import { TasksListByDueDate } from "../tasks/TasksListByDueDate";
+import type { ContactNote } from "../types";
+import { Note } from "./Note";
 import { NoteCreate } from "./NoteCreate";
 import type { NextActionNote } from "./nextActionTask";
 import { useCreateNextActionTask } from "./useCreateNextActionTask";
 
 const meta = {
   title: "Atomic CRM/Notes/Next Action Reminder",
-  includeStories: ["NoteCreateWithTaskList"],
+  includeStories: ["NoteCreateWithTaskList", "InlineNoteEditWithTaskList"],
 } satisfies Meta;
 
 export default meta;
@@ -115,6 +118,52 @@ export const SavedNoteWithTaskList = ({
   <StoryWrapper data={{ contacts: [CONTACT] }}>
     <SaveNoteButton label="Save note" note={note} previousNote={previousNote} />
     <SaveNoteButton label="Save control note" note={CONTROL_NOTE} />
+    <TaskList />
+  </StoryWrapper>
+);
+
+export const EXISTING_NOTE_ID = 10;
+
+export const EXISTING_NOTE_TEXT = "Recap of the discovery call";
+
+/** A note already stored for the contact, as the desktop note list renders it. */
+export const buildExistingNote = (
+  overrides: Partial<ContactNote> = {},
+): ContactNote => ({
+  id: EXISTING_NOTE_ID,
+  contact_id: CONTACT.id,
+  sales_id: 0,
+  date: "2026-01-01T10:00:00.000Z",
+  status: "warm",
+  text: EXISTING_NOTE_TEXT,
+  ...overrides,
+});
+
+const StoredNote = () => {
+  const { data } = useGetOne<ContactNote>("contact_notes", {
+    id: EXISTING_NOTE_ID,
+  });
+
+  if (!data) return null;
+
+  return <Note note={data} isLast />;
+};
+
+/**
+ * The real desktop inline note editor, next to the task list it is expected to
+ * feed — the counterpart of `NoteCreateWithTaskList` for the edit path.
+ */
+export const InlineNoteEditWithTaskList = ({
+  note = buildExistingNote(),
+}: {
+  note?: ContactNote;
+}) => (
+  <StoryWrapper data={{ contacts: [CONTACT], contact_notes: [note] }}>
+    <ResourceContextProvider value="contact_notes">
+      <RecordContextProvider value={CONTACT}>
+        <StoredNote />
+      </RecordContextProvider>
+    </ResourceContextProvider>
     <TaskList />
   </StoryWrapper>
 );

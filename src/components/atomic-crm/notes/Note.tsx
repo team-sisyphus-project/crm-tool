@@ -28,6 +28,7 @@ import type { ContactNote, DealNote } from "../types";
 import { NoteAttachments } from "./NoteAttachments";
 import { NextActionSummary } from "./NextActionSummary";
 import { NoteInputs } from "./NoteInputs";
+import { useCreateNextActionTask } from "./useCreateNextActionTask";
 import { useGetSalesName } from "../sales/useGetSalesName";
 
 export const Note = ({
@@ -61,6 +62,7 @@ export const Note = ({
   }, [note.text]);
 
   const [update, { isPending }] = useUpdate();
+  const createNextActionTask = useCreateNextActionTask();
 
   const [deleteNote] = useDelete(resource, undefined, {
     mutationMode: "undoable",
@@ -93,7 +95,10 @@ export const Note = ({
       resource,
       { id: note.id, data: values, previousData: note },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          // Same reminder behavior as the mobile edit sheet: a next action
+          // added or changed here becomes a task, an untouched one does not.
+          void createNextActionTask(data, note);
           setEditing(false);
           setHover(false);
         },
@@ -130,6 +135,7 @@ export const Note = ({
                   variant="ghost"
                   size="sm"
                   onClick={handleEnterEditMode}
+                  aria-label={translate("resources.notes.action.edit")}
                   className="p-1 h-auto cursor-pointer"
                 >
                   <Edit className="w-4 h-4" />
@@ -147,6 +153,7 @@ export const Note = ({
                   variant="ghost"
                   size="sm"
                   onClick={handleDelete}
+                  aria-label={translate("resources.notes.action.delete")}
                   className="p-1 h-auto cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />

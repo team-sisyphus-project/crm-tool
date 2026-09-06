@@ -4,8 +4,11 @@ import {
   CONTACT,
   CONTROL_NOTE,
   EMPTY_PLACEHOLDER_TEXT,
+  EXISTING_NOTE_TEXT,
+  InlineNoteEditWithTaskList,
   NoteCreateWithTaskList,
   SavedNoteWithTaskList,
+  buildExistingNote,
   daysFromNow,
   toDateTimeInputValue,
 } from "./NextActionReminder.stories";
@@ -77,5 +80,47 @@ describe("next action reminder", () => {
 
     await expect.element(screen.getByText("Tomorrow")).toBeVisible();
     expect(screen.container.textContent).toContain(NEXT_ACTION);
+  });
+
+  it("creates a reminder when an existing note is edited to add a next action", async () => {
+    const screen = await render(<InlineNoteEditWithTaskList />);
+
+    await expect
+      .element(screen.getByText(EMPTY_PLACEHOLDER_TEXT))
+      .toBeVisible();
+
+    await screen.getByText(EXISTING_NOTE_TEXT).hover();
+    await screen.getByRole("button", { name: "Edit note" }).click();
+    await screen.getByRole("button", { name: "Show options" }).click();
+    await screen.getByLabelText("Next action").fill(NEXT_ACTION);
+    await screen
+      .getByLabelText("Deadline")
+      .fill(toDateTimeInputValue(daysFromNow(1)));
+    await screen.getByRole("button", { name: "Update note" }).click();
+
+    await expect.element(screen.getByText("Tomorrow")).toBeVisible();
+    expect(screen.container.textContent).toContain(NEXT_ACTION);
+  });
+
+  it("creates no second reminder when an existing note is edited without touching its next action", async () => {
+    const screen = await render(
+      <InlineNoteEditWithTaskList
+        note={buildExistingNote({
+          next_action: NEXT_ACTION,
+          next_action_date: daysFromNow(1).toISOString(),
+        })}
+      />,
+    );
+
+    await screen.getByText(EXISTING_NOTE_TEXT).hover();
+    await screen.getByRole("button", { name: "Edit note" }).click();
+    await screen.getByPlaceholder("Add a note").fill("Recap, with details");
+    await screen.getByRole("button", { name: "Update note" }).click();
+
+    // The save went through — and left the task list empty.
+    await expect.element(screen.getByText("Recap, with details")).toBeVisible();
+    await expect
+      .element(screen.getByText(EMPTY_PLACEHOLDER_TEXT))
+      .toBeVisible();
   });
 });
