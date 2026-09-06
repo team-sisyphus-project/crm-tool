@@ -7,6 +7,7 @@ import {
 } from "ra-core";
 import { TextField } from "@/components/admin/text-field";
 import { AsideInfoRow } from "../misc/AsideInfoRow";
+import { CampaignStatusBadge } from "../misc/CampaignStatusBadge";
 import { formatLocalizedDate } from "../misc/RelativeDate";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { Contact } from "../types";
@@ -44,6 +45,7 @@ export const ContactBackgroundInfo = () => {
           label={translate("resources.contacts.fields.campaign")}
           value={record.campaign}
           emptyText={translate("crm.common.no_campaign")}
+          trailing={<CampaignStatusBadge status={record.campaign_status} />}
         />
       </div>
 

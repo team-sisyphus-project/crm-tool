@@ -40,4 +40,24 @@ describe("ContactBackgroundInfo", () => {
       .element(screen.getByText("No associated campaign"))
       .toBeVisible();
   });
+
+  it("shows where the associated campaign stands in its lifecycle", async () => {
+    const screen = await renderBackgroundInfo(
+      buildContact({ campaign: "Spring Outreach", campaign_status: "active" }),
+    );
+
+    await expect.element(screen.getByText("Spring Outreach")).toBeVisible();
+    await expect.element(screen.getByText("Active")).toBeVisible();
+  });
+
+  it("shows the campaign without a lifecycle state when the contact has no status", async () => {
+    const screen = await renderBackgroundInfo(
+      buildContact({ campaign: "Spring Outreach", campaign_status: null }),
+    );
+
+    await expect.element(screen.getByText("Spring Outreach")).toBeVisible();
+    for (const label of ["Planning", "Active", "Completed"]) {
+      await expect.element(screen.getByText(label)).not.toBeInTheDocument();
+    }
+  });
 });

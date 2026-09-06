@@ -14,6 +14,7 @@ import { SelectField } from "@/components/admin/select-field";
 
 import { formatLocalizedDate } from "../misc/RelativeDate";
 import { AsideInfoRow } from "../misc/AsideInfoRow";
+import { CampaignStatusBadge } from "../misc/CampaignStatusBadge";
 import { AsideSection } from "../misc/AsideSection";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Company } from "../types";
@@ -152,6 +153,7 @@ export const ContextInfo = ({ record }: { record: Company }) => {
         label={translate("resources.companies.fields.campaign")}
         value={record.campaign}
         emptyText={translate("crm.common.no_campaign")}
+        trailing={<CampaignStatusBadge status={record.campaign_status} />}
       />
     </AsideSection>
   );

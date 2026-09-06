@@ -40,4 +40,27 @@ describe("CompanyAside ContextInfo", () => {
       .element(screen.getByText("No associated campaign"))
       .toBeVisible();
   });
+
+  it("shows where the associated campaign stands in its lifecycle", async () => {
+    const screen = await renderContextInfo(
+      buildCompany({
+        campaign: "Year-End Renewal",
+        campaign_status: "completed",
+      }),
+    );
+
+    await expect.element(screen.getByText("Year-End Renewal")).toBeVisible();
+    await expect.element(screen.getByText("Completed")).toBeVisible();
+  });
+
+  it("shows the campaign without a lifecycle state when the company has no status", async () => {
+    const screen = await renderContextInfo(
+      buildCompany({ campaign: "Year-End Renewal", campaign_status: null }),
+    );
+
+    await expect.element(screen.getByText("Year-End Renewal")).toBeVisible();
+    for (const label of ["Planning", "Active", "Completed"]) {
+      await expect.element(screen.getByText(label)).not.toBeInTheDocument();
+    }
+  });
 });
