@@ -411,6 +411,11 @@ export const englishCrmMessages = {
       no_campaign: "No associated campaign",
       task_count: "%{smart_count} task |||| %{smart_count} tasks",
     },
+    campaign_status: {
+      planning: "Planning",
+      active: "Active",
+      completed: "Completed",
+    },
     changelog: {
       title: "Changelog",
     },

@@ -417,6 +417,11 @@ export const frenchCrmMessages = {
       me: "Moi",
       no_campaign: "Aucune campagne associée",
     },
+    campaign_status: {
+      planning: "Planification",
+      active: "En cours",
+      completed: "Terminée",
+    },
     changelog: {
       title: "Notes de version",
     },

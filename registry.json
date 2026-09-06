@@ -42,6 +42,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/campaignStatus.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/tasks/tasksPredicate.ts",
           "type": "registry:component"
         },
@@ -430,6 +434,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/misc/campaignStatusVocabulary.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/misc/Status.tsx",
           "type": "registry:component"
         },
@@ -475,6 +483,10 @@
         },
         {
           "path": "src/components/atomic-crm/misc/ChangelogPage.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/misc/CampaignStatusBadge.tsx",
           "type": "registry:component"
         },
         {
