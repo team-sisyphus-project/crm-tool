@@ -16,7 +16,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     visualizer({
-      open: process.env.NODE_ENV !== "CI",
+      // Only pop the bundle report open for a human at an interactive terminal;
+      // a headless/CI build must finish instead of waiting on a browser.
+      open: !process.env.CI && process.stdout.isTTY === true,
       filename: "./dist/stats.html",
     }),
     createHtmlPlugin({
