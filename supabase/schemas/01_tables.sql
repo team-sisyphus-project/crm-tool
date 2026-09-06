@@ -30,7 +30,9 @@ create table public.companies (
     revenue text,
     tax_identifier text,
     logo jsonb,
-    campaign text
+    campaign text,
+    campaign_status text,
+    constraint companies_campaign_status_check check (campaign_status in ('planning', 'active', 'completed'))
 );
 
 create table public.contacts (
@@ -51,7 +53,9 @@ create table public.contacts (
     linkedin_url text,
     email_jsonb jsonb,
     phone_jsonb jsonb,
-    campaign text
+    campaign text,
+    campaign_status text,
+    constraint contacts_campaign_status_check check (campaign_status in ('planning', 'active', 'completed'))
 );
 
 create table public.contact_notes (

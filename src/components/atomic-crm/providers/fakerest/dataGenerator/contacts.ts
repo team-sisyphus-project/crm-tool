@@ -73,6 +73,11 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
     const first_seen = randomDate(new Date(company.created_at)).toISOString();
     const last_seen = first_seen;
 
+    // The campaign is stored on the contact itself, not derived from its
+    // company; the generator mirrors the company's when there is one, which is
+    // the common case in the field.
+    const campaign = weightedBoolean(50) ? (company.campaign ?? null) : null;
+
     return {
       id,
       first_name,
@@ -96,10 +101,10 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       sales_id: company.sales_id!,
       nb_tasks: 0,
       linkedin_url: null,
-      // The campaign is stored on the contact itself, not derived from its
-      // company; the generator mirrors the company's when there is one, which
-      // is the common case in the field.
-      campaign: weightedBoolean(50) ? (company.campaign ?? null) : null,
+      campaign,
+      // The status follows the campaign it belongs to, so a contact reusing its
+      // company's campaign reuses that campaign's status too.
+      campaign_status: campaign ? (company.campaign_status ?? null) : null,
     };
   });
 };

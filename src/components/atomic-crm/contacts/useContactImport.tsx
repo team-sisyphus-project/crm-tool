@@ -1,6 +1,7 @@
 import { useDataProvider, useGetIdentity, type DataProvider } from "ra-core";
 import { useCallback, useMemo } from "react";
 
+import { parseCampaignStatus } from "../campaignStatus";
 import type { Company, Tag } from "../types";
 
 export type ContactImportSchema = {
@@ -24,6 +25,7 @@ export type ContactImportSchema = {
   tags: string;
   linkedin_url: string;
   campaign: string;
+  campaign_status: string;
 };
 
 export function useContactImport() {
@@ -106,6 +108,7 @@ export function useContactImport() {
             tags: tagNames,
             linkedin_url,
             campaign,
+            campaign_status,
           }) => {
             const email_jsonb = [
               { email: email_work, type: "Work" },
@@ -146,6 +149,10 @@ export function useContactImport() {
                 sales_id: user?.identity?.id,
                 linkedin_url,
                 campaign,
+                // The column comes from a user-authored file, so an unknown or
+                // misspelled status is dropped rather than rejected by the
+                // database check constraint.
+                campaign_status: parseCampaignStatus(campaign_status),
               },
             });
           },

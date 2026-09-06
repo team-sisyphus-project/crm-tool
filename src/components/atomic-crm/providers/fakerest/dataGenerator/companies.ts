@@ -9,6 +9,7 @@ import {
 } from "faker/locale/en_US";
 
 import { randomDate, weightedBoolean } from "./utils";
+import { CAMPAIGN_STATUSES } from "../../../campaignStatus";
 import { defaultCompanySectors } from "../../../root/defaultConfiguration";
 import type { Company, RAFile } from "../../../types";
 import type { Db } from "./types";
@@ -27,6 +28,10 @@ const regex = /\W+/;
 export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
   return Array.from(Array(size).keys()).map((id) => {
     const name = company.companyName();
+    // Two thirds of the records stay unassigned, to exercise the empty state.
+    const campaign = weightedBoolean(33)
+      ? random.arrayElement(campaigns)
+      : null;
     return {
       id,
       name: name,
@@ -55,8 +60,9 @@ export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
       tax_identifier: random.alphaNumeric(10),
       country: random.arrayElement(["USA", "France", "UK"]),
       context_links: [],
-      // Two thirds of the records stay unassigned, to exercise the empty state.
-      campaign: weightedBoolean(33) ? random.arrayElement(campaigns) : null,
+      campaign,
+      // A status only makes sense for a company that has a campaign.
+      campaign_status: campaign ? random.arrayElement(CAMPAIGN_STATUSES) : null,
     };
   });
 };

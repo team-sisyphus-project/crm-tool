@@ -1,6 +1,7 @@
 import type { Identifier, RaRecord } from "ra-core";
 import type { ComponentType } from "react";
 
+import type { CampaignStatus } from "./campaignStatus";
 import type {
   COMPANY_CREATED,
   CONTACT_CREATED,
@@ -68,6 +69,7 @@ export type Company = {
   country: string;
   context_links?: string[];
   campaign?: string | null;
+  campaign_status?: CampaignStatus | null;
   nb_contacts?: number;
   nb_deals?: number;
 } & Pick<RaRecord, "id">;
@@ -100,6 +102,7 @@ export type Contact = {
   background: string;
   phone_jsonb: PhoneNumberAndType[];
   campaign?: string | null;
+  campaign_status?: CampaignStatus | null;
   nb_tasks?: number;
   company_name?: string;
 } & Pick<RaRecord, "id">;

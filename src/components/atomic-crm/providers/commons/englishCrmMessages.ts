@@ -22,6 +22,7 @@ export const englishCrmMessages = {
         description: "Description",
         context_links: "Context links",
         campaign: "Associated campaign",
+        campaign_status: "Campaign status",
         sales_id: "Account manager",
       },
       empty: {
@@ -86,6 +87,7 @@ export const englishCrmMessages = {
         background: "Background info (bio, how you met, etc)",
         has_newsletter: "Has newsletter",
         campaign: "Associated campaign",
+        campaign_status: "Campaign status",
         sales_id: "Account manager",
       },
       action: {

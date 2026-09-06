@@ -24,6 +24,7 @@ export const frenchCrmMessages = {
         description: "Description",
         context_links: "URLs de contexte",
         campaign: "Campagne associée",
+        campaign_status: "Statut de la campagne",
         sales_id: "Responsable de compte",
       },
       empty: {
@@ -89,6 +90,7 @@ export const frenchCrmMessages = {
         background: "Informations de contexte",
         has_newsletter: "Abonné à la newsletter",
         campaign: "Campagne associée",
+        campaign_status: "Statut de la campagne",
         sales_id: "Responsable de compte",
       },
       action: {
