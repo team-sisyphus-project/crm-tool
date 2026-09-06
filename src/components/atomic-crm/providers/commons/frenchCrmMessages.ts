@@ -435,6 +435,7 @@ export const frenchCrmMessages = {
       you_added_deal: "Vous avez ajouté l'affaire",
       at_company: "chez",
       to: "à",
+      compact_view: "Vue compacte",
       load_more: "Charger plus d'activité",
     },
     dashboard: {

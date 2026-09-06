@@ -4,7 +4,7 @@ import { ReferenceField } from "@/components/admin/reference-field";
 import { TextField } from "@/components/admin/text-field";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar } from "../contacts/Avatar";
-import { RelativeDate } from "../misc/RelativeDate";
+import { ActivityDate, ActivityDateGutter } from "./ActivityDate";
 import { NextActionSummary } from "../notes/NextActionSummary";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { ActivityContactNoteCreated, Contact } from "../types";
@@ -64,16 +64,12 @@ export function ActivityLogContactNoteCreated({
             {context !== "company" && (
               <>
                 {" "}
-                <RelativeDate date={activity.date} />
+                <ActivityDate date={activity.date} />
               </>
             )}
           </span>
 
-          {context === "company" && (
-            <span className="text-muted-foreground text-sm">
-              <RelativeDate date={activity.date} />
-            </span>
-          )}
+          {context === "company" && <ActivityDateGutter date={activity.date} />}
         </div>
       }
       text={contactNote.text}

@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { ReferenceField } from "@/components/admin/reference-field";
 import { Avatar } from "../contacts/Avatar";
-import { RelativeDate } from "../misc/RelativeDate";
+import { ActivityDate, ActivityDateGutter } from "./ActivityDate";
 import type { ActivityContactCreated } from "../types";
 import { useActivityLogContext } from "./ActivityLogContext";
 import { useGetSalesName } from "../sales/useGetSalesName";
@@ -51,15 +51,11 @@ export function ActivityLogContactCreated({
                   />
                 </>
               )}{" "}
-              <RelativeDate date={activity.date} />
+              <ActivityDate date={activity.date} />
             </>
           )}
         </span>
-        {context === "company" && (
-          <span className="text-muted-foreground text-sm">
-            <RelativeDate date={activity.date} />
-          </span>
-        )}
+        {context === "company" && <ActivityDateGutter date={activity.date} />}
       </div>
     </div>
   );

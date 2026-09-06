@@ -2,7 +2,7 @@ import { type RaRecord, useGetIdentity, useTranslate } from "ra-core";
 
 import { ReferenceField } from "@/components/admin/reference-field";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
-import { RelativeDate } from "../misc/RelativeDate";
+import { ActivityDate, ActivityDateGutter } from "./ActivityDate";
 import { NextActionSummary } from "../notes/NextActionSummary";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { ActivityDealNoteCreated } from "../types";
@@ -74,16 +74,12 @@ export function ActivityLogDealNoteCreated({
                     link="show"
                   />
                 </ReferenceField>{" "}
-                <RelativeDate date={activity.date} />
+                <ActivityDate date={activity.date} />
               </>
             )}
           </span>
 
-          {context === "company" && (
-            <span className="text-muted-foreground text-sm">
-              <RelativeDate date={activity.date} />
-            </span>
-          )}
+          {context === "company" && <ActivityDateGutter date={activity.date} />}
         </div>
       }
       text={dealNote.text}

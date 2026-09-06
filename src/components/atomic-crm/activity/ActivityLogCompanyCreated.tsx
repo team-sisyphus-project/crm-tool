@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { useGetSalesName } from "../sales/useGetSalesName";
-import { RelativeDate } from "../misc/RelativeDate";
+import { ActivityDate, ActivityDateGutter } from "./ActivityDate";
 import type { ActivityCompanyCreated } from "../types";
 import { useActivityLogContext } from "./ActivityLogContext";
 
@@ -38,15 +38,11 @@ export function ActivityLogCompanyCreated({
           {context === "all" && (
             <>
               {" "}
-              <RelativeDate date={activity.date} />
+              <ActivityDate date={activity.date} />
             </>
           )}
         </span>
-        {context === "company" && (
-          <span className="text-muted-foreground text-sm">
-            <RelativeDate date={activity.date} />
-          </span>
-        )}
+        {context === "company" && <ActivityDateGutter date={activity.date} />}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { type RaRecord, useGetIdentity, useTranslate } from "ra-core";
 import { Link } from "react-router";
 
 import { ReferenceField } from "@/components/admin/reference-field";
-import { RelativeDate } from "../misc/RelativeDate";
+import { ActivityDate, ActivityDateGutter } from "./ActivityDate";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { ActivityDealCreated } from "../types";
 import { useActivityLogContext } from "./ActivityLogContext";
@@ -49,15 +49,11 @@ export function ActivityLogDealCreated({
                 record={activity}
                 link="show"
               />{" "}
-              <RelativeDate date={activity.date} />
+              <ActivityDate date={activity.date} />
             </>
           )}
         </span>
-        {context === "company" && (
-          <span className="text-muted-foreground text-sm">
-            <RelativeDate date={activity.date} />
-          </span>
-        )}
+        {context === "company" && <ActivityDateGutter date={activity.date} />}
       </div>
     </div>
   );

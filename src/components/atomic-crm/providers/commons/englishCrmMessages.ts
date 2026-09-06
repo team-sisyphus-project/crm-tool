@@ -429,6 +429,7 @@ export const englishCrmMessages = {
       you_added_deal: "You added deal",
       at_company: "at",
       to: "to",
+      compact_view: "Compact view",
       load_more: "Load more activity",
     },
     dashboard: {

@@ -1,6 +1,8 @@
 import { type ReactNode } from "react";
 import { Link } from "react-router";
 
+import { useIsCompactActivityLog } from "./ActivityLogDensityContext";
+
 type ActivityLogNoteProps = {
   header: ReactNode;
   text: string;
@@ -15,6 +17,8 @@ export function ActivityLogNote({
   link,
   nextAction,
 }: ActivityLogNoteProps) {
+  const isCompact = useIsCompactActivityLog();
+
   if (!text) {
     return null;
   }
@@ -24,6 +28,12 @@ export function ActivityLogNote({
   const textElement = (
     <p className="text-sm line-clamp-3 overflow-hidden">{plainText}</p>
   );
+
+  // A compact row keeps the headline — who did what, with its links — and drops
+  // the note body and follow-up line, which the note itself still carries.
+  if (isCompact) {
+    return <div className="flex w-full items-center">{header}</div>;
+  }
 
   return (
     <div className="p-0">

@@ -24,10 +24,13 @@ import { ActivityLogContactNoteCreated } from "./ActivityLogContactNoteCreated";
 import { ActivityLogDealCreated } from "./ActivityLogDealCreated";
 import { ActivityLogDealNoteCreated } from "./ActivityLogDealNoteCreated";
 import { InfinitePagination } from "../misc/InfinitePagination";
+import { useIsCompactActivityLog } from "./ActivityLogDensityContext";
+import { ActivityLogTimelineRow } from "./ActivityLogTimelineRow";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ActivityLogIterator() {
   const isMobile = useIsMobile();
+  const isCompact = useIsCompactActivityLog();
   const { data, isPending, error, refetch } = useListContext<Activity>();
   const { hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfinitePaginationContext();
@@ -70,12 +73,29 @@ export function ActivityLogIterator() {
 
   return (
     <div className="space-y-4">
-      {data?.map((activity, index) => (
-        <Fragment key={index}>
-          <ActivityItem activity={activity} />
-          {index < data.length - 1 && <Separator />}
-        </Fragment>
-      ))}
+      {isCompact ? (
+        <ol className="list-none">
+          {data?.map((activity, index) => (
+            <ActivityLogTimelineRow
+              key={index}
+              date={activity.date}
+              isFirst={index === 0}
+              isLast={index === data.length - 1}
+            >
+              <ActivityItem activity={activity} />
+            </ActivityLogTimelineRow>
+          ))}
+        </ol>
+      ) : (
+        <div className="space-y-4">
+          {data?.map((activity, index) => (
+            <Fragment key={index}>
+              <ActivityItem activity={activity} />
+              {index < data.length - 1 && <Separator />}
+            </Fragment>
+          ))}
+        </div>
+      )}
 
       {/* Desktop: explicit Load More button */}
       {!isMobile && hasNextPage && (
