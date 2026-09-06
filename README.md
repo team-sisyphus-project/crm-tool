@@ -59,6 +59,35 @@ If you need debug the backend, you can access the following services:
 - Attachments storage: [http://localhost:54323/project/default/storage/buckets/attachments](http://localhost:54323/project/default/storage/buckets/attachments)
 - Inbucket email testing service: [http://localhost:54324/](http://localhost:54324/)
 
+## Green-field database setup
+
+`make start` already provisions and migrates a local database. Use the two
+scripts below when you have an **empty** Postgres and want to bring it to the
+current schema — a fresh clone, CI, or a preview environment where the platform
+injects a connection string:
+
+```sh
+export DATABASE_URL="postgresql://user:password@host:5432/postgres"
+npm run db:migrate   # applies supabase/migrations/*.sql
+npm run db:seed      # applies supabase/seed.sql
+```
+
+Both are idempotent: each file is recorded in `supabase_migrations`
+(`schema_migrations` for migrations, `seed_files` for the seed, the same tables
+the Supabase CLI uses), so re-running them applies nothing twice. Both are also
+a deliberate no-op — a message and exit code 0 — when `DATABASE_URL` is unset,
+so a checkout with no database still builds and boots.
+
+These SQL files target a **Supabase** database: they reference the `auth` and
+`storage` schemas, the `anon` / `authenticated` / `service_role` roles, and the
+`pg_net` / `pgjwt` / `http` extensions, none of which a stock Postgres ships. If
+the target has no `auth` schema, the scripts say so and skip instead of failing
+halfway through. Get a suitable database with `npx supabase start` (local) or by
+pointing `DATABASE_URL` at a Supabase project.
+
+There are **no dummy accounts**: no user is seeded. Sign up on the login screen
+after starting the app — the first account created becomes the administrator.
+
 ## Documentation
 
 The user and developer documentation for this project is available [in the `doc/` directory](./doc/). You can also read it online at [https://marmelab.com/atomic-crm/doc/](https://marmelab.com/atomic-crm/doc/).

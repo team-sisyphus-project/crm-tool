@@ -9,6 +9,8 @@ import react from "@vitejs/plugin-react";
 //                  the .claude/hooks/*.mjs hooks as subprocesses. No DOM, no browser.
 //   - "server":    static-server tests, plain Node: they spawn server.mjs and hit it
 //                  over HTTP. No DOM, no browser.
+//   - "db":        db:migrate / db:seed script tests, plain Node: they spawn the
+//                  scripts as subprocesses. Skipped when no Postgres is reachable.
 //   - "functions": Supabase Edge Function tests. Written for Deno with JSR imports;
 //                  Node-only here, with the jsr:/npm: specifiers aliased to their
 //                  installed npm equivalents. Aliases are scoped to this project.
@@ -66,6 +68,8 @@ export default defineConfig({
             ".claude/**",
             // The static server test is Node-only too; see the "server" project.
             "server.test.mjs",
+            // The db:migrate / db:seed script tests are Node-only; see "db".
+            "scripts/**/*.test.mjs",
           ],
           server: {
             deps: {
@@ -82,6 +86,17 @@ export default defineConfig({
           // Spawns a real node process and waits for it to bind a port.
           testTimeout: 20000,
           hookTimeout: 20000,
+        },
+      },
+      {
+        test: {
+          name: "db",
+          environment: "node",
+          include: ["scripts/**/*.test.mjs"],
+          // Spawns node subprocesses that shell out to psql against a scratch
+          // database, so it needs more headroom than the default 5s.
+          testTimeout: 30000,
+          hookTimeout: 30000,
         },
       },
       {
