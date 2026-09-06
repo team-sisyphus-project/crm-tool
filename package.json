@@ -5,6 +5,7 @@
   "scripts": {
     "test:unit:app": "vitest --config vitest.config.ts",
     "test:unit:claude": "vitest --config vitest.config.ts --project claude",
+    "test:unit:server": "vitest --config vitest.config.ts --project server",
     "test:unit:functions": "vitest --config vitest.config.ts --project functions",
     "dev": "vite --force",
     "dev:demo": "vite --config vite.demo.config --force",
@@ -12,6 +13,7 @@
     "build:e2e": "vite build --mode e2e",
     "build:demo": "tsc && vite build --config vite.demo.config",
     "typecheck": "tsc --noEmit --project tsconfig.app.json",
+    "start": "node server.mjs",
     "preview": "vite preview",
     "preview:demo": "npm run build:demo && vite preview",
     "lint:apply": "eslint **/*.{mjs,ts,tsx} --fix",
