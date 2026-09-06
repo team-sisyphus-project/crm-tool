@@ -85,8 +85,52 @@ the target has no `auth` schema, the scripts say so and skip instead of failing
 halfway through. Get a suitable database with `npx supabase start` (local) or by
 pointing `DATABASE_URL` at a Supabase project.
 
-There are **no dummy accounts**: no user is seeded. Sign up on the login screen
-after starting the app — the first account created becomes the administrator.
+The seed creates **no user account**. Sign up on the login screen after starting
+the app — the first account created becomes the administrator. (The demo build
+described below ships its own dummy account and needs no database at all.)
+
+## Running locally (preview build)
+
+`make start` above runs the Vite dev server against a local Supabase stack. The
+commands below instead reproduce what a hosting platform does: one build, one
+Node process, one port. They work from a clean checkout, with no backend
+configured and no Docker running.
+
+```sh
+npm ci                 # install exactly what package-lock.json pins
+npm run build:demo     # build the app into dist/
+npm run db:migrate     # no-op (exit 0) unless DATABASE_URL is set
+npm run db:seed        # no-op (exit 0) unless DATABASE_URL is set
+PORT=3000 npm start    # serve dist/ on $PORT
+```
+
+Then open <http://localhost:3000/>. The first screen is the CRM dashboard,
+served with HTTP 200; deep links such as `/contacts` resolve on a hard refresh
+too.
+
+`npm start` (`node server.mjs`) takes its port from `PORT` — no port is
+hardcoded — binds `0.0.0.0`, and speaks plain HTTP, because TLS is terminated
+upstream. All of its configuration is environment-only and optional; the
+RUNTIME block of [`.env.example`](./.env.example) lists every variable
+(`PORT`, `HOST`, `STATIC_ROOT`, `DATABASE_URL`, `REDIS_URL`) with its default.
+[`preview.toml`](./preview.toml) pins these same build and run commands for the
+platform's local preview.
+
+### Dummy account
+
+`build:demo` produces the demo bundle: it runs on in-browser fake data
+(`VITE_IS_DEMO=true`), needs no Supabase instance, and resets on every page
+reload. It signs you in automatically as the seeded demo user, so the dashboard
+is the first thing you see. If you log out, sign back in with:
+
+| Email | Password |
+| ----- | -------- |
+| `janedoe@atomic.dev` | `demo` |
+
+To run the same single-port server against a **real** Supabase backend, export
+`VITE_SUPABASE_URL` and `VITE_SB_PUBLISHABLE_KEY`, then swap the build step for
+`npm run build` and apply the migrations and seed from the section above. That
+build has no dummy account — sign up on the login screen instead.
 
 ## Documentation
 
