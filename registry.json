@@ -362,6 +362,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/notes/nextActionPriority.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/notes/index.ts",
           "type": "registry:component"
         },
@@ -822,11 +826,23 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/activity/ActivityLogTimelineRow.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/activity/ActivityLogNote.tsx",
           "type": "registry:component"
         },
         {
           "path": "src/components/atomic-crm/activity/ActivityLogIterator.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/activity/ActivityLogDensityToggle.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/activity/ActivityLogDensityContext.tsx",
           "type": "registry:component"
         },
         {
@@ -855,6 +871,10 @@
         },
         {
           "path": "src/components/atomic-crm/activity/ActivityLog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/activity/ActivityDate.tsx",
           "type": "registry:component"
         },
         {

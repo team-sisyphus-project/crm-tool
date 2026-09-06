@@ -29,10 +29,16 @@ export function ActivityLogNote({
     <p className="text-sm line-clamp-3 overflow-hidden">{plainText}</p>
   );
 
-  // A compact row keeps the headline — who did what, with its links — and drops
-  // the note body and follow-up line, which the note itself still carries.
+  // A compact row keeps the headline — who did what, with its links — and the
+  // follow-up highlight, and drops the note body, which the note itself still
+  // carries.
   if (isCompact) {
-    return <div className="flex w-full items-center">{header}</div>;
+    return (
+      <div className="flex w-full items-center gap-2">
+        {header}
+        {nextAction}
+      </div>
+    );
   }
 
   return (

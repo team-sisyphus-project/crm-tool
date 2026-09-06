@@ -282,6 +282,11 @@ export const englishCrmMessages = {
       actions: {
         attach_document: "Attach document",
       },
+      priority: {
+        overdue: "Overdue",
+        today: "Due today",
+        upcoming: "Upcoming",
+      },
       validation: {
         note_or_attachment_required: "A note or an attachment is required",
         next_action_required_with_date:

@@ -287,6 +287,11 @@ export const frenchCrmMessages = {
       actions: {
         attach_document: "Joindre un document",
       },
+      priority: {
+        overdue: "En retard",
+        today: "À faire aujourd'hui",
+        upcoming: "À venir",
+      },
       validation: {
         note_or_attachment_required: "Une note ou une pièce jointe est requise",
         next_action_required_with_date:
