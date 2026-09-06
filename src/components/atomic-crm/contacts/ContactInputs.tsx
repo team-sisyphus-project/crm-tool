@@ -18,6 +18,8 @@ import { SelectInput } from "@/components/admin/select-input";
 import { ArrayInput } from "@/components/admin/array-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 
+import { parseCampaignStatus } from "../campaignStatus";
+import { CAMPAIGN_STATUS_CHOICES } from "../misc/campaignStatusVocabulary";
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
 import { StatusSelector } from "../notes";
 import type { Sale, Contact } from "../types";
@@ -213,6 +215,12 @@ const ContactMiscInputs = () => {
       </h6>
       <TextInput source="background" multiline helperText={false} />
       <TextInput source="campaign" helperText={false} />
+      <SelectInput
+        source="campaign_status"
+        choices={CAMPAIGN_STATUS_CHOICES}
+        helperText={false}
+        parse={parseCampaignStatus}
+      />
       <BooleanInput source="has_newsletter" helperText={false} />
       <ReferenceInput
         reference="sales"

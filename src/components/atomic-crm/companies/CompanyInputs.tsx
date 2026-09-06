@@ -7,6 +7,8 @@ import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+import { parseCampaignStatus } from "../campaignStatus";
+import { CAMPAIGN_STATUS_CHOICES } from "../misc/campaignStatusVocabulary";
 import ImageEditorField from "../misc/ImageEditorField";
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
 import { useConfigurationContext } from "../root/ConfigurationContext";
@@ -119,6 +121,12 @@ const CompanyContextInputs = () => {
       <TextInput source="revenue" helperText={false} />
       <TextInput source="tax_identifier" helperText={false} />
       <TextInput source="campaign" helperText={false} />
+      <SelectInput
+        source="campaign_status"
+        choices={CAMPAIGN_STATUS_CHOICES}
+        helperText={false}
+        parse={parseCampaignStatus}
+      />
     </div>
   );
 };
