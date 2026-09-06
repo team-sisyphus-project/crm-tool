@@ -19,7 +19,7 @@ const noteDueTomorrow = {
   contact_id: CONTACT.id,
   sales_id: 0,
   next_action: NEXT_ACTION,
-  next_action_date: daysFromNow(1).toISOString(),
+  reminder_date: daysFromNow(1).toISOString(),
 };
 
 describe("next action reminder", () => {
@@ -107,7 +107,7 @@ describe("next action reminder", () => {
       <InlineNoteEditWithTaskList
         note={buildExistingNote({
           next_action: NEXT_ACTION,
-          next_action_date: daysFromNow(1).toISOString(),
+          reminder_date: daysFromNow(1).toISOString(),
         })}
       />,
     );

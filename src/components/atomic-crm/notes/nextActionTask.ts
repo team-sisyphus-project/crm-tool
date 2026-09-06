@@ -13,7 +13,7 @@ export type NextActionNote = {
   contact_id?: Identifier | null;
   sales_id?: Identifier | null;
   next_action?: string | null;
-  next_action_date?: string | null;
+  reminder_date?: string | null;
 };
 
 const normalize = (value?: string | null) =>
@@ -25,8 +25,7 @@ export const isSameNextAction = (
   previousNote?: NextActionNote | null,
 ) =>
   normalize(note?.next_action) === normalize(previousNote?.next_action) &&
-  normalize(note?.next_action_date) ===
-    normalize(previousNote?.next_action_date);
+  normalize(note?.reminder_date) === normalize(previousNote?.reminder_date);
 
 /**
  * Builds the reminder task for a note's next action, or `null` when the note
@@ -40,7 +39,7 @@ export const buildNextActionTask = (
   note: NextActionNote,
 ): Omit<Task, "id"> | null => {
   const text = normalize(note.next_action);
-  const dueDate = normalize(note.next_action_date);
+  const dueDate = normalize(note.reminder_date);
   if (!text || !dueDate || note.contact_id == null) return null;
 
   const parsedDueDate = new Date(dueDate);

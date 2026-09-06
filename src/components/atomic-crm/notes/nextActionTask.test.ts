@@ -8,7 +8,7 @@ const noteWithNextAction = {
   contact_id: 7,
   sales_id: 3,
   next_action: "Send the proposal",
-  next_action_date: "2026-03-18T09:00:00.000Z",
+  reminder_date: "2026-03-18T09:00:00.000Z",
 };
 
 describe("buildNextActionTask", () => {
@@ -28,7 +28,7 @@ describe("buildNextActionTask", () => {
   it("normalizes the deadline to an ISO string", () => {
     const task = buildNextActionTask({
       ...noteWithNextAction,
-      next_action_date: "2026-03-18T09:00:00Z",
+      reminder_date: "2026-03-18T09:00:00Z",
     });
 
     expect(task?.due_date).toBe("2026-03-18T09:00:00.000Z");
@@ -48,14 +48,14 @@ describe("buildNextActionTask", () => {
       buildNextActionTask({
         ...noteWithNextAction,
         next_action: null,
-        next_action_date: null,
+        reminder_date: null,
       }),
     ).toBeNull();
   });
 
   it("returns null when the next action has no deadline to remind on", () => {
     expect(
-      buildNextActionTask({ ...noteWithNextAction, next_action_date: null }),
+      buildNextActionTask({ ...noteWithNextAction, reminder_date: null }),
     ).toBeNull();
   });
 
@@ -69,7 +69,7 @@ describe("buildNextActionTask", () => {
     expect(
       buildNextActionTask({
         ...noteWithNextAction,
-        next_action_date: "not-a-date",
+        reminder_date: "not-a-date",
       }),
     ).toBeNull();
   });
@@ -105,7 +105,7 @@ describe("isSameNextAction", () => {
     expect(
       isSameNextAction(noteWithNextAction, {
         ...noteWithNextAction,
-        next_action_date: "2026-03-25T09:00:00.000Z",
+        reminder_date: "2026-03-25T09:00:00.000Z",
       }),
     ).toBe(false);
   });
@@ -115,7 +115,7 @@ describe("isSameNextAction", () => {
       isSameNextAction(noteWithNextAction, {
         contact_id: 7,
         next_action: null,
-        next_action_date: null,
+        reminder_date: null,
       }),
     ).toBe(false);
   });

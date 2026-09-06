@@ -125,7 +125,7 @@ describe("NoteInputs", () => {
       <NoteInputsStory
         defaultValues={{
           next_action: "Send the proposal",
-          next_action_date: "2024-01-08T09:00",
+          reminder_date: "2024-01-08T09:00",
         }}
       />,
     );
@@ -162,7 +162,7 @@ describe("NoteInputs", () => {
         withSaveButton
         defaultValues={{
           text: "Call summary",
-          next_action_date: "2024-01-08T09:00",
+          reminder_date: "2024-01-08T09:00",
         }}
       />,
     );

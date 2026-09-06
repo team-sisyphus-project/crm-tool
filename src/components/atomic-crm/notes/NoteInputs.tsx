@@ -17,7 +17,7 @@ import { foreignKeyMapping } from "./foreignKeyMapping";
 import { AutocompleteInput, ReferenceInput } from "@/components/admin";
 import { contactOptionText } from "../misc/ContactOption";
 import {
-  validateNextActionDateRequiresText,
+  validateReminderDateRequiresText,
   validateNoteOrAttachmentRequired,
 } from "./noteModel";
 
@@ -189,11 +189,11 @@ export const NoteInputs = ({
             helperText={false}
           />
           <DateTimeInput
-            source="next_action_date"
-            label="resources.notes.fields.next_action_date"
+            source="reminder_date"
+            label="resources.notes.fields.reminder_date"
             helperText={false}
             className="text-primary"
-            validate={validateNextActionDateRequiresText}
+            validate={validateReminderDateRequiresText}
           />
         </div>
         <FileInput

@@ -12,10 +12,10 @@ export const validateNoteOrAttachmentRequired = (
 };
 
 /**
- * A next action date is only meaningful next to the action it refers to:
+ * A reminder date is only meaningful next to the action it refers to:
  * a date alone would be stored but never rendered.
  */
-export const validateNextActionDateRequiresText = (
+export const validateReminderDateRequiresText = (
   value: string | null | undefined,
   values: { next_action?: string | null },
 ) => {

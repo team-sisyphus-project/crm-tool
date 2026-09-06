@@ -51,14 +51,14 @@ const isIsoDate = (value: string) => !Number.isNaN(Date.parse(value));
 
 const expectCoherentNextActionPair = (note: ContactNote | DealNote) => {
   if (note.next_action == null) {
-    expect(note.next_action_date).toBeNull();
+    expect(note.reminder_date).toBeNull();
     return;
   }
 
   expect(note.next_action.length).toBeGreaterThan(0);
-  expect(typeof note.next_action_date).toBe("string");
-  expect(isIsoDate(note.next_action_date as string)).toBe(true);
-  expect(Date.parse(note.next_action_date as string)).toBeGreaterThan(
+  expect(typeof note.reminder_date).toBe("string");
+  expect(isIsoDate(note.reminder_date as string)).toBe(true);
+  expect(Date.parse(note.reminder_date as string)).toBeGreaterThan(
     Date.parse(note.date),
   );
 };

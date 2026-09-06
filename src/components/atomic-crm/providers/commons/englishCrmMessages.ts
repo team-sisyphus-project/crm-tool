@@ -244,7 +244,7 @@ export const englishCrmMessages = {
         contact_id: "Contact",
         deal_id: "Deal",
         next_action: "Next action",
-        next_action_date: "Deadline",
+        reminder_date: "Deadline",
       },
       action: {
         add: "Add note",

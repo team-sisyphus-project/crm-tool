@@ -5,7 +5,7 @@ import { RelativeDate } from "../misc/RelativeDate";
 
 type NextActionSummaryNote = {
   next_action?: string | null;
-  next_action_date?: string | null;
+  reminder_date?: string | null;
 };
 
 /**
@@ -29,9 +29,9 @@ export function NextActionSummary({ note }: { note: NextActionSummaryNote }) {
         {translate("resources.notes.fields.next_action")}
       </span>
       <span className="font-medium">{note.next_action}</span>
-      {note.next_action_date && (
+      {note.reminder_date && (
         <span className="text-muted-foreground">
-          <RelativeDate date={note.next_action_date} />
+          <RelativeDate date={note.reminder_date} />
         </span>
       )}
     </div>

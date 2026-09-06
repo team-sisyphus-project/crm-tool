@@ -249,7 +249,7 @@ export const frenchCrmMessages = {
         contact_id: "Contact",
         deal_id: "Affaire",
         next_action: "Prochaine action",
-        next_action_date: "Échéance",
+        reminder_date: "Échéance",
       },
       action: {
         add: "Ajouter une note",

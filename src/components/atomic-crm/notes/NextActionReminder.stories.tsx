@@ -49,7 +49,7 @@ export const CONTROL_NOTE: NextActionNote = {
   contact_id: CONTACT.id,
   sales_id: 0,
   next_action: "Book the kickoff",
-  next_action_date: daysFromNow(30).toISOString(),
+  reminder_date: daysFromNow(30).toISOString(),
 };
 
 // NoteCreate is always rendered inside the contact's note list; it only reads

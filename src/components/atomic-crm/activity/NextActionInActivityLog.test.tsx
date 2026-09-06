@@ -47,7 +47,7 @@ describe("next action in the activity log", () => {
         dealNotes={[
           buildDealNote({
             next_action: NEXT_ACTION,
-            next_action_date: daysFromNow(1).toISOString(),
+            reminder_date: daysFromNow(1).toISOString(),
           }),
         ]}
       />,

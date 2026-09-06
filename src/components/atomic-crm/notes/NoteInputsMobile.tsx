@@ -17,7 +17,7 @@ import { contactOptionText } from "../misc/ContactOption";
 import { AttachmentField } from "./AttachmentField";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import {
-  validateNextActionDateRequiresText,
+  validateReminderDateRequiresText,
   validateNoteOrAttachmentRequired,
 } from "./noteModel";
 import type { ContactNote } from "../types";
@@ -85,11 +85,11 @@ export const NoteInputsMobile = ({
           helperText={false}
         />
         <DateTimeInput
-          source="next_action_date"
-          label="resources.notes.fields.next_action_date"
+          source="reminder_date"
+          label="resources.notes.fields.reminder_date"
           helperText={false}
           className="text-primary"
-          validate={validateNextActionDateRequiresText}
+          validate={validateReminderDateRequiresText}
         />
       </div>
       <div className="px-4">
