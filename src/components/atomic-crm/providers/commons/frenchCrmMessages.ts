@@ -350,6 +350,8 @@ export const frenchCrmMessages = {
       },
       empty: "Aucune tâche pour l'instant",
       empty_list_hint: "Les tâches ajoutées à vos contacts apparaîtront ici.",
+      next_action_failed:
+        "La note a été enregistrée, mais le rappel de sa prochaine action n'a pas pu être créé.",
       filters: {
         later: "Plus tard",
         overdue: "En retard",

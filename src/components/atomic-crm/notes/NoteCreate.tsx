@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { NoteInputs } from "./NoteInputs";
 import { getCurrentDate } from "./utils";
 import { foreignKeyMapping } from "./foreignKeyMapping";
+import { useCreateNextActionTask } from "./useCreateNextActionTask";
 
 export const NoteCreate = ({
   reference,
@@ -67,6 +68,7 @@ const NoteCreateButton = ({
   const { identity } = useGetIdentity();
   const { reset } = useFormContext();
   const { refetch } = useListContext();
+  const createNextActionTask = useCreateNextActionTask();
 
   if (!record || !identity) return null;
 
@@ -82,6 +84,8 @@ const NoteCreateButton = ({
   };
 
   const handleSuccess = (data: any) => {
+    void createNextActionTask(data);
+
     if (reference === "contacts") {
       resetValues.status = data.status ?? defaultStatus;
     }

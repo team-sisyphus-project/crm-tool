@@ -13,6 +13,7 @@ import { CreateSheet } from "../misc/CreateSheet";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { NoteInputsMobile } from "./NoteInputsMobile";
 import { getCurrentDate } from "./utils";
+import { useCreateNextActionTask } from "./useCreateNextActionTask";
 
 export interface NoteCreateSheetProps {
   open: boolean;
@@ -39,11 +40,14 @@ export const NoteCreateSheet = ({
   const redirect = useRedirect();
   const translate = useTranslate();
   const getContactRepresentation = useGetRecordRepresentation("contacts");
+  const createNextActionTask = useCreateNextActionTask();
   const defaultStatus = selectContact ? undefined : contact?.status;
 
   if (!identity) return null;
 
   const handleSuccess = async (data: any) => {
+    await createNextActionTask(data);
+
     const referenceRecordId = data[foreignKeyMapping["contacts"]];
     if (!referenceRecordId) return;
     const { data: contact } = await dataProvider.getOne("contacts", {

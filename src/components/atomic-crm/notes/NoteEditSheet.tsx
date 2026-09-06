@@ -4,7 +4,9 @@ import {
   useCreatePath,
   useDeleteController,
   useGetRecordRepresentation,
+  useNotify,
   useRecordContext,
+  useRedirect,
   useTranslate,
 } from "ra-core";
 import { ReferenceField } from "@/components/admin";
@@ -18,6 +20,7 @@ import {
 import { EditSheet } from "../misc/EditSheet";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { NoteInputsMobile } from "./NoteInputsMobile";
+import { useCreateNextActionTask } from "./useCreateNextActionTask";
 
 export interface NoteEditSheetProps {
   open: boolean;
@@ -32,6 +35,9 @@ export const NoteEditSheet = ({
 }: NoteEditSheetProps) => {
   const createPath = useCreatePath();
   const translate = useTranslate();
+  const notify = useNotify();
+  const redirect = useRedirect();
+  const createNextActionTask = useCreateNextActionTask();
   const getRedirectTo = (record: any) => {
     return createPath({
       resource: "contacts",
@@ -40,6 +46,22 @@ export const NoteEditSheet = ({
     });
   };
   const getContactRepresentation = useGetRecordRepresentation("contacts");
+
+  // Taking over onSuccess disables EditSheet's default close/notify/redirect,
+  // so they are reproduced here alongside the next action reminder.
+  const handleSuccess = (data: any, variables: any) => {
+    void createNextActionTask(data, variables?.previousData);
+    notify("resources.contact_notes.notifications.updated", {
+      type: "info",
+      messageArgs: {
+        smart_count: 1,
+        _: translate("ra.notification.updated", { smart_count: 1 }),
+      },
+      undoable: true,
+    });
+    redirect(getRedirectTo(data));
+    onOpenChange(false);
+  };
 
   return (
     <EditSheet
@@ -61,6 +83,7 @@ export const NoteEditSheet = ({
         />
       }
       redirect={(_resource, _id, record) => getRedirectTo(record)}
+      mutationOptions={{ onSuccess: handleSuccess }}
       open={open}
       onOpenChange={onOpenChange}
       headerActions={

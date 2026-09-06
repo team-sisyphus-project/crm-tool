@@ -344,6 +344,8 @@ export const englishCrmMessages = {
       },
       empty: "No tasks yet",
       empty_list_hint: "Tasks added to your contacts will appear here.",
+      next_action_failed:
+        "The note was saved, but its next action reminder could not be created.",
       filters: {
         later: "Later",
         overdue: "Overdue",
