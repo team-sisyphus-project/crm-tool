@@ -111,6 +111,44 @@ describe("NoteInputs", () => {
     await expect(dateInput).toHaveValue("2024-01-01T12:00");
   });
 
+  it("shows the next action inputs without opening the options section once the note is expanded", async () => {
+    const screen = await render(<Default />);
+
+    await screen.getByPlaceholder("Add a note").fill("Call summary");
+
+    // The options section is still collapsed...
+    await expect
+      .element(screen.getByRole("button", { name: "Show options" }))
+      .toBeVisible();
+    // ...yet both follow-up fields are already reachable.
+    await expect.element(screen.getByLabelText("Next action")).toBeVisible();
+    await expect.element(screen.getByLabelText("Deadline")).toBeVisible();
+  });
+
+  it("keeps the next action inputs out of the way while the note body is empty", async () => {
+    const screen = await render(<Default />);
+
+    await expect
+      .element(screen.getByText("Next action"))
+      .not.toBeInTheDocument();
+    await expect.element(screen.getByText("Deadline")).not.toBeInTheDocument();
+  });
+
+  it("submits a next action typed without opening the options section", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(<NoteInputsStory onSubmit={onSubmit} />);
+
+    await screen.getByPlaceholder("Add a note").fill("Call summary");
+    await screen.getByLabelText("Next action").fill("Send the proposal");
+    await screen.getByRole("button", { name: "Save" }).click();
+
+    await vi.waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      text: "Call summary",
+      next_action: "Send the proposal",
+    });
+  });
+
   it("reveals the next action inputs in the extra options section", async () => {
     const screen = await render(<Default />);
 

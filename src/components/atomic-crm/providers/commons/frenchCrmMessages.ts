@@ -280,6 +280,7 @@ export const frenchCrmMessages = {
       added: "Note ajoutée",
       inputs: {
         add_note: "Ajouter une note",
+        next_action_placeholder: "ex. Envoyer la proposition",
         options_hint: "(joindre des fichiers ou modifier les détails)",
         show_options: "Afficher les options",
       },

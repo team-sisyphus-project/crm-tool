@@ -44,6 +44,9 @@ export const NoteInputs = ({
   const selectedStatus = useWatch({ control, name: "status" });
   const textValue = useWatch({ control, name: "text" as any });
   const isExpanded = isFocused || !!textValue;
+  // The collapsed "Show options" block also reveals it, so the fields are
+  // never stranded once the user has opened the details section.
+  const showNextAction = isExpanded || displayMore;
   useEffect(() => {
     if (!textValue) {
       setIsFocused(false);
@@ -134,6 +137,29 @@ export const NoteInputs = ({
         </ReferenceInput>
       )}
 
+      {/* Next action and its deadline drive the follow-up task, so they are
+          rendered as soon as the note expands — no need to open "Show options".
+          Values survive the unmount: react-hook-form keeps unregistered fields. */}
+      {showNextAction && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TextInput
+            source="next_action"
+            label="resources.notes.fields.next_action"
+            placeholder={translate(
+              "resources.notes.inputs.next_action_placeholder",
+            )}
+            helperText={false}
+          />
+          <DateTimeInput
+            source="reminder_date"
+            label="resources.notes.fields.reminder_date"
+            helperText={false}
+            className="text-primary"
+            validate={validateReminderDateRequiresText}
+          />
+        </div>
+      )}
+
       {!displayMore && (
         <div className="flex justify-end items-center gap-2">
           <Button
@@ -180,20 +206,6 @@ export const NoteInputs = ({
             helperText={false}
             className="text-primary"
             defaultValue={getCurrentDate()}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextInput
-            source="next_action"
-            label="resources.notes.fields.next_action"
-            helperText={false}
-          />
-          <DateTimeInput
-            source="reminder_date"
-            label="resources.notes.fields.reminder_date"
-            helperText={false}
-            className="text-primary"
-            validate={validateReminderDateRequiresText}
           />
         </div>
         <FileInput

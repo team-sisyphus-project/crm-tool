@@ -275,6 +275,7 @@ export const englishCrmMessages = {
       added: "Note added",
       inputs: {
         add_note: "Add a note",
+        next_action_placeholder: "e.g. Send the proposal",
         options_hint: "(attach files, or change details)",
         show_options: "Show options",
       },

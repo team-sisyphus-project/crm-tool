@@ -82,6 +82,9 @@ export const NoteInputsMobile = ({
         <TextInput
           source="next_action"
           label="resources.notes.fields.next_action"
+          placeholder={translate(
+            "resources.notes.inputs.next_action_placeholder",
+          )}
           helperText={false}
         />
         <DateTimeInput
