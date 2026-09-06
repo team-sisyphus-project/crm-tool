@@ -1,4 +1,4 @@
-import { ArrowRight, CircleX, Edit, Save, Trash2 } from "lucide-react";
+import { CircleX, Edit, Save, Trash2 } from "lucide-react";
 import {
   Form,
   useDelete,
@@ -26,6 +26,7 @@ import { RelativeDate } from "../misc/RelativeDate";
 import { Status } from "../misc/Status";
 import type { ContactNote, DealNote } from "../types";
 import { NoteAttachments } from "./NoteAttachments";
+import { NextActionSummary } from "./NextActionSummary";
 import { NoteInputs } from "./NoteInputs";
 import { useGetSalesName } from "../sales/useGetSalesName";
 
@@ -212,20 +213,7 @@ export const Note = ({
             </button>
           )}
 
-          {note.next_action && (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 text-sm">
-              <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground">
-                {translate("resources.notes.fields.next_action")}
-              </span>
-              <span className="font-medium">{note.next_action}</span>
-              {note.next_action_date && (
-                <span className="text-muted-foreground">
-                  <RelativeDate date={note.next_action_date} />
-                </span>
-              )}
-            </div>
-          )}
+          <NextActionSummary note={note} />
 
           {note.attachments && <NoteAttachments note={note} />}
         </div>

@@ -5,6 +5,7 @@ import { TextField } from "@/components/admin/text-field";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar } from "../contacts/Avatar";
 import { RelativeDate } from "../misc/RelativeDate";
+import { NextActionSummary } from "../notes/NextActionSummary";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { ActivityContactNoteCreated, Contact } from "../types";
 import { useActivityLogContext } from "./ActivityLogContext";
@@ -77,6 +78,7 @@ export function ActivityLogContactNoteCreated({
       }
       text={contactNote.text}
       link={link}
+      nextAction={<NextActionSummary note={contactNote} />}
     />
   );
 }

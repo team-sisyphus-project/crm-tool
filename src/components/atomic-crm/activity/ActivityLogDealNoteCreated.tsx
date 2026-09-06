@@ -3,6 +3,7 @@ import { type RaRecord, useGetIdentity, useTranslate } from "ra-core";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { RelativeDate } from "../misc/RelativeDate";
+import { NextActionSummary } from "../notes/NextActionSummary";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { ActivityDealNoteCreated } from "../types";
 import { useActivityLogContext } from "./ActivityLogContext";
@@ -87,6 +88,7 @@ export function ActivityLogDealNoteCreated({
       }
       text={dealNote.text}
       link={isMobile ? false : `/deals/${dealNote.deal_id}/show`}
+      nextAction={<NextActionSummary note={dealNote} />}
     />
   );
 }

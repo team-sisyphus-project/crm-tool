@@ -5,9 +5,16 @@ type ActivityLogNoteProps = {
   header: ReactNode;
   text: string;
   link: string | false;
+  /** Next-action summary line, rendered under the note text and outside the link. */
+  nextAction?: ReactNode;
 };
 
-export function ActivityLogNote({ header, text, link }: ActivityLogNoteProps) {
+export function ActivityLogNote({
+  header,
+  text,
+  link,
+  nextAction,
+}: ActivityLogNoteProps) {
   if (!text) {
     return null;
   }
@@ -35,6 +42,7 @@ export function ActivityLogNote({ header, text, link }: ActivityLogNoteProps) {
           ) : (
             textElement
           )}
+          {nextAction}
         </div>
       </div>
     </div>
