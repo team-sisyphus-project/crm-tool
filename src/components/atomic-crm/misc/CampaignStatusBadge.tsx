@@ -61,11 +61,13 @@ export const CampaignStatusBadge = ({
 /**
  * The same color cue in a compact dot, for dense surfaces such as a select
  * option where a full badge would fight with the option label.
+ *
+ * Rendered as an `<svg>` and meant to be a direct child of a `Badge`, so its
+ * size comes from the registered Badge's own icon sizing rather than from a
+ * literal restated here.
  */
 export const CampaignStatusDot = ({ color }: { color: string }) => (
-  <span
-    aria-hidden="true"
-    className="inline-block w-2.5 h-2.5 rounded-full border"
-    style={{ backgroundColor: color }}
-  />
+  <svg viewBox="0 0 8 8" aria-hidden="true" focusable="false">
+    <circle cx="4" cy="4" r="4" fill={color} />
+  </svg>
 );

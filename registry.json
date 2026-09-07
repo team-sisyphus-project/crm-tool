@@ -478,6 +478,14 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/misc/CampaignStatusInput.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/misc/CampaignStatusBadge.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/misc/AsideSection.tsx",
           "type": "registry:component"
         },

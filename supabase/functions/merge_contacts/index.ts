@@ -72,6 +72,7 @@ function mergeContactData(winner: Contact, loser: Contact) {
           : loser.last_seen
         : (winner.last_seen ?? loser.last_seen),
     sales_id: winner.sales_id ?? loser.sales_id,
+    campaign_status: winner.campaign_status ?? loser.campaign_status,
     tags: mergeArraysUnique(winner.tags || [], loser.tags || []),
   };
 }

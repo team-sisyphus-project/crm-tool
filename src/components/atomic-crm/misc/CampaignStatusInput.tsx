@@ -1,14 +1,20 @@
 import { SelectInput } from "@/components/admin/select-input";
+import { Badge } from "@/components/ui/badge";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { CampaignStatus } from "../types";
 import { CampaignStatusDot } from "./CampaignStatusBadge";
 
+/**
+ * The option reuses the Badge with its chrome suppressed: it reads as plain
+ * text next to a colored dot, while the dot's size and the gap before the
+ * label still come from the registered Badge instead of being restated here.
+ */
 const campaignStatusOptionText = (choice: CampaignStatus) => (
-  <span className="inline-flex items-center gap-2">
+  <Badge variant="outline" className="border-transparent px-0 font-normal">
     <CampaignStatusDot color={choice.color} />
     {choice.label}
-  </span>
+  </Badge>
 );
 
 /**
