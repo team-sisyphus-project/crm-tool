@@ -111,6 +111,11 @@ export const Task = ({
   return (
     <>
       <div
+        // The row states which emphasis treatment it is wearing. The accent and
+        // the surface are the treatment, but a class list is not a readable
+        // state, and the same three words name the design's two variants and
+        // its neutral case.
+        data-emphasis={isUrgent ? "urgent" : isFlagged ? "priority" : "none"}
         className={cn(
           "flex items-start justify-between rounded-r-sm border-l-2 py-1 pl-2",
           isUrgent && "border-destructive bg-destructive/10",

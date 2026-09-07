@@ -128,3 +128,167 @@ describe("Task urgency highlight", () => {
     expect(screen.getByText("Due today").elements()).toHaveLength(0);
   });
 });
+
+/**
+ * The unit-test browser does not load the Tailwind stylesheet (the
+ * `@tailwindcss/vite` plugin is only wired into `vite.config.ts`, not into
+ * `vitest.config.ts`), so the accent, the surface and the tinted label cannot be
+ * observed by reading computed colours. The row therefore reports which
+ * emphasis treatment it is wearing through `data-emphasis`, and the assertions
+ * below pair that state with the utilities that actually paint it — the same
+ * pairing `ActivityLogNote.test.tsx` uses for the collapsed note body.
+ */
+describe("Task emphasis treatment", () => {
+  const TASK_TEXT = "Call Ada back about the renewal";
+
+  const classesOf = (element: Element | null | undefined) =>
+    new Set(
+      (element?.getAttribute("class") ?? "").split(/\s+/).filter(Boolean),
+    );
+
+  const rowOf = (container: Element) =>
+    container.querySelector("[data-emphasis]");
+
+  const labelBlockOf = (element: Element) => element.closest(".flex-grow");
+
+  it("paints an overdue task with the alarm rule and surface", async () => {
+    const screen = await renderTask(
+      buildTask({ due_date: new Date(Date.now() - 2 * DAY).toISOString() }),
+    );
+
+    const row = rowOf(screen.container);
+    const classes = classesOf(row);
+
+    expect(row?.getAttribute("data-emphasis")).toBe("urgent");
+    expect(classes.has("border-destructive")).toBe(true);
+    expect(classes.has("bg-destructive/10")).toBe(true);
+  });
+
+  it("tints the action label of an urgent task", async () => {
+    const screen = await renderTask(
+      buildTask({ due_date: new Date(Date.now() - 2 * DAY).toISOString() }),
+    );
+
+    const labelBlock = labelBlockOf(screen.getByText(TASK_TEXT).element());
+
+    expect(classesOf(labelBlock).has("text-destructive")).toBe(true);
+  });
+
+  it("paints a task due today with the same alarm treatment as an overdue one", async () => {
+    const screen = await renderTask(buildTask({}));
+
+    const row = rowOf(screen.container);
+
+    expect(row?.getAttribute("data-emphasis")).toBe("urgent");
+    expect(classesOf(row).has("border-destructive")).toBe(true);
+  });
+
+  it("raises a flagged task without giving it the alarm colour", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() + 7 * DAY).toISOString(),
+        priority: "high",
+      }),
+    );
+
+    const row = rowOf(screen.container);
+    const classes = classesOf(row);
+
+    expect(row?.getAttribute("data-emphasis")).toBe("priority");
+    expect(classes.has("border-foreground")).toBe(true);
+    expect(classes.has("bg-accent")).toBe(true);
+    expect(classes.has("border-destructive")).toBe(false);
+    expect(classes.has("bg-destructive/10")).toBe(false);
+  });
+
+  it("leaves the action label of a flagged task at the default colour", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() + 7 * DAY).toISOString(),
+        priority: "high",
+      }),
+    );
+
+    const labelBlock = labelBlockOf(screen.getByText(TASK_TEXT).element());
+
+    expect(classesOf(labelBlock).has("text-destructive")).toBe(false);
+  });
+
+  it("keeps the accent slot occupied on a plain row, so an emphasized row does not shift sideways", async () => {
+    const screen = await renderTask(
+      buildTask({ due_date: new Date(Date.now() + 7 * DAY).toISOString() }),
+    );
+
+    const row = rowOf(screen.container);
+    const classes = classesOf(row);
+
+    expect(row?.getAttribute("data-emphasis")).toBe("none");
+    expect(classes.has("border-l-2")).toBe(true);
+    expect(classes.has("border-transparent")).toBe(true);
+    expect(classes.has("bg-accent")).toBe(false);
+    expect(classes.has("bg-destructive/10")).toBe(false);
+  });
+
+  it("lets lateness win the row treatment when a flagged task is also overdue", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() - 2 * DAY).toISOString(),
+        priority: "high",
+      }),
+    );
+
+    const row = rowOf(screen.container);
+    const classes = classesOf(row);
+
+    expect(row?.getAttribute("data-emphasis")).toBe("urgent");
+    expect(classes.has("border-destructive")).toBe(true);
+    expect(classes.has("border-foreground")).toBe(false);
+    expect(classes.has("bg-accent")).toBe(false);
+  });
+
+  it("strips the treatment from a completed task and strikes its label through", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() - 2 * DAY).toISOString(),
+        priority: "high",
+        done_date: new Date().toISOString(),
+      }),
+    );
+
+    const row = rowOf(screen.container);
+    const classes = classesOf(row);
+    const labelBlock = labelBlockOf(screen.getByText(TASK_TEXT).element());
+
+    expect(row?.getAttribute("data-emphasis")).toBe("none");
+    expect(classes.has("border-transparent")).toBe(true);
+    expect(classes.has("bg-destructive/10")).toBe(false);
+    expect(classesOf(labelBlock).has("line-through")).toBe(true);
+  });
+
+  it("writes the urgency label in the alarm colour, on a due line that stays muted", async () => {
+    const screen = await renderTask(
+      buildTask({ due_date: new Date(Date.now() - 2 * DAY).toISOString() }),
+    );
+
+    const label = screen.getByText("Overdue").element();
+
+    expect(classesOf(label).has("text-destructive")).toBe(true);
+    expect(classesOf(label.parentElement).has("text-muted-foreground")).toBe(
+      true,
+    );
+  });
+
+  it("writes the priority label in the neutral colour rather than the alarm one", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() + 7 * DAY).toISOString(),
+        priority: "high",
+      }),
+    );
+
+    const label = screen.getByText("High priority").element();
+
+    expect(classesOf(label).has("text-foreground")).toBe(true);
+    expect(classesOf(label).has("text-destructive")).toBe(false);
+  });
+});
