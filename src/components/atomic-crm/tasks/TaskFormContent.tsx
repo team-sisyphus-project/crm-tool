@@ -7,6 +7,7 @@ import { DateTimeInput } from "@/components/admin";
 
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { taskPriorityChoices } from "./taskPriority";
 
 export const TaskFormContent = ({
   selectContact,
@@ -49,6 +50,12 @@ export const TaskFormContent = ({
           optionText="label"
           optionValue="value"
           defaultValue="none"
+          helperText={false}
+        />
+        <SelectInput
+          source="priority"
+          choices={taskPriorityChoices}
+          defaultValue="normal"
           helperText={false}
         />
       </div>

@@ -144,6 +144,8 @@ export type Tag = {
   color: string;
 };
 
+export type TaskPriority = "normal" | "high";
+
 export type Task = {
   contact_id: Identifier;
   type: string;
@@ -151,6 +153,8 @@ export type Task = {
   due_date: string;
   done_date?: string | null;
   sales_id?: Identifier;
+  /** Set by a person, independent of the due date. Unset means normal. */
+  priority?: TaskPriority | null;
 } & Pick<RaRecord, "id">;
 
 export type ActivityCompanyCreated = {

@@ -25,6 +25,7 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Contact, Task as TData } from "../types";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
+import { isHighPriority } from "./taskPriority";
 import { isDueToday, isOverdue } from "./tasksPredicate";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -96,20 +97,25 @@ export const Task = ({
   const isTaskOverdue = !isCompleted && isOverdue(task.due_date);
   const isTaskDueToday = !isCompleted && isDueToday(task.due_date);
   const isUrgent = isTaskOverdue || isTaskDueToday;
-  const urgencyLabel = isTaskOverdue
+  // Lateness outranks importance: when both apply, the clock is the more
+  // actionable fact, and two accents on one row would read as a third state.
+  const isFlagged = !isCompleted && !isUrgent && isHighPriority(task);
+  const emphasisLabel = isTaskOverdue
     ? translate("resources.tasks.urgency.overdue")
     : isTaskDueToday
       ? translate("resources.tasks.urgency.due_today")
-      : null;
+      : isFlagged
+        ? translate("resources.tasks.priority.flagged")
+        : null;
 
   return (
     <>
       <div
         className={cn(
           "flex items-start justify-between rounded-r-sm border-l-2 py-1 pl-2",
-          isUrgent
-            ? "border-destructive bg-destructive/10"
-            : "border-transparent",
+          isUrgent && "border-destructive bg-destructive/10",
+          isFlagged && "border-foreground bg-accent",
+          !isUrgent && !isFlagged && "border-transparent",
         )}
       >
         <div
@@ -152,11 +158,16 @@ export const Task = ({
               {translate("resources.tasks.fields.due_short")}
               &nbsp;
               <DateField source="due_date" record={task} showDate showTime />
-              {urgencyLabel && (
+              {emphasisLabel && (
                 <>
                   {" "}
-                  <span className="text-xs font-medium text-destructive">
-                    {urgencyLabel}
+                  <span
+                    className={cn(
+                      "text-xs font-medium",
+                      isUrgent ? "text-destructive" : "text-foreground",
+                    )}
+                  >
+                    {emphasisLabel}
                   </span>
                 </>
               )}

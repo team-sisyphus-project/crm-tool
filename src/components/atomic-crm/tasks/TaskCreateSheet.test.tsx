@@ -105,4 +105,23 @@ describe("TaskCreateSheet", () => {
     expect(updatedContact.data.last_seen).not.toBe(originalLastSeen);
     expect(updatedContact.data.nb_tasks).toBe(1);
   });
+
+  it("lets the author flag the task as high priority", async () => {
+    const screen = await render(
+      <Mobile
+        data={{
+          contacts: [buildContact({ first_name: "Ada", id: 1 })],
+          tasks: [],
+        }}
+      />,
+    );
+
+    const priorityInput = screen.getByLabelText(/priority/i);
+    await expect.element(priorityInput).toHaveTextContent("Normal");
+
+    await priorityInput.click();
+    await expect
+      .element(screen.getByRole("listbox").getByText("High"))
+      .toBeVisible();
+  });
 });

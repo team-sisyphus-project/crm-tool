@@ -57,7 +57,11 @@ describe("TaskListFilter", () => {
         wrapper: Wrapper,
       },
     );
-    await expect.element(screen.getByText("Today")).toBeInTheDocument();
+    // Exact match: task rows carry their own emphasis label, and a substring
+    // locator would also match a row that is flagged as due today.
+    await expect
+      .element(screen.getByText("Today", { exact: true }))
+      .toBeInTheDocument();
   });
 
   it("does not show Load more when tasks fit in one page", async () => {

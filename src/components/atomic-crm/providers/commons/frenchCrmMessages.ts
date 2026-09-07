@@ -323,6 +323,7 @@ export const frenchCrmMessages = {
         type: "Type",
         contact_id: "Contact",
         due_short: "échéance",
+        priority: "Priorité",
       },
       action: {
         add: "Ajouter une tâche",
@@ -353,6 +354,11 @@ export const frenchCrmMessages = {
         today: "Aujourd'hui",
         tomorrow: "Demain",
         with_pending: "Avec des tâches en attente",
+      },
+      priority: {
+        normal: "Normale",
+        high: "Haute",
+        flagged: "Priorité haute",
       },
       regarding_contact: "(Concernant : %{name})",
       urgency: {

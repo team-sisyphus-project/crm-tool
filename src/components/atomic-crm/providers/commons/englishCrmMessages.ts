@@ -317,6 +317,7 @@ export const englishCrmMessages = {
         type: "Type",
         contact_id: "Contact",
         due_short: "due",
+        priority: "Priority",
       },
       action: {
         add: "Add task",
@@ -347,6 +348,11 @@ export const englishCrmMessages = {
         today: "Today",
         tomorrow: "Tomorrow",
         with_pending: "With pending tasks",
+      },
+      priority: {
+        normal: "Normal",
+        high: "High",
+        flagged: "High priority",
       },
       regarding_contact: "(Re: %{name})",
       urgency: {

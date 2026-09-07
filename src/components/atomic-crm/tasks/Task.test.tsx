@@ -60,6 +60,59 @@ describe("Task urgency highlight", () => {
     expect(screen.getByText("Due today").elements()).toHaveLength(0);
   });
 
+  it("flags a high-priority task that is not yet late", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() + 7 * DAY).toISOString(),
+        priority: "high",
+      }),
+    );
+
+    await expect.element(screen.getByText("High priority")).toBeVisible();
+    expect(screen.getByText("Overdue").elements()).toHaveLength(0);
+    expect(screen.getByText("Due today").elements()).toHaveLength(0);
+  });
+
+  it("shows lateness rather than importance when a high-priority task is overdue", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() - 2 * DAY).toISOString(),
+        priority: "high",
+      }),
+    );
+
+    await expect.element(screen.getByText("Overdue")).toBeVisible();
+    expect(screen.getByText("High priority").elements()).toHaveLength(0);
+  });
+
+  it("leaves a normal-priority task due later without any flag", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() + 7 * DAY).toISOString(),
+        priority: "normal",
+      }),
+    );
+
+    expect(screen.getByText("High priority").elements()).toHaveLength(0);
+    expect(screen.getByText("Overdue").elements()).toHaveLength(0);
+    expect(screen.getByText("Due today").elements()).toHaveLength(0);
+  });
+
+  it("drops the priority flag once a high-priority task is completed", async () => {
+    const screen = await renderTask(
+      buildTask({
+        due_date: new Date(Date.now() + 7 * DAY).toISOString(),
+        priority: "high",
+        done_date: new Date().toISOString(),
+      }),
+    );
+
+    await expect
+      .element(screen.getByText("Call Ada back about the renewal"))
+      .toBeVisible();
+    expect(screen.getByText("High priority").elements()).toHaveLength(0);
+  });
+
   it("drops the urgency flag once an overdue task is completed", async () => {
     const screen = await renderTask(
       buildTask({

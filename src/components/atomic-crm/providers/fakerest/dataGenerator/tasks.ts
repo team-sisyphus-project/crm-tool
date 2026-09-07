@@ -47,6 +47,8 @@ export const generateTasks = (db: Db) => {
         new Date(Date.now() + 100 * 24 * 60 * 60 * 1000),
       ).toISOString(),
       done_date: undefined,
+      // Roughly one action in five is flagged important by its owner.
+      priority: datatype.number({ min: 1, max: 5 }) === 1 ? "high" : "normal",
       sales_id: 0,
     };
   });

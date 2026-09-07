@@ -115,7 +115,8 @@ create table public.tasks (
     text text,
     due_date timestamp with time zone,
     done_date timestamp with time zone,
-    sales_id bigint
+    sales_id bigint,
+    priority text
 );
 
 create table public.configuration (
