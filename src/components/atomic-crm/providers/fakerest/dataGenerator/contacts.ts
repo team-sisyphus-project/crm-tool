@@ -96,6 +96,8 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       sales_id: company.sales_id!,
       nb_tasks: 0,
       linkedin_url: null,
+      // No campaign vocabulary exists yet, so demo contacts start unassigned.
+      campaign_status: null,
     };
   });
 };

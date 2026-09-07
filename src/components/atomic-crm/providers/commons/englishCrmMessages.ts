@@ -22,6 +22,7 @@ export const englishCrmMessages = {
         description: "Description",
         context_links: "Context links",
         sales_id: "Account manager",
+        campaign_status: "Campaign status",
       },
       empty: {
         description: "It seems your company list is empty.",
@@ -85,6 +86,7 @@ export const englishCrmMessages = {
         background: "Background info (bio, how you met, etc)",
         has_newsletter: "Has newsletter",
         sales_id: "Account manager",
+        campaign_status: "Campaign status",
       },
       action: {
         add: "Add contact",

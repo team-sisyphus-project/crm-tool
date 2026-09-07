@@ -24,6 +24,7 @@ export const frenchCrmMessages = {
         description: "Description",
         context_links: "URLs de contexte",
         sales_id: "Responsable de compte",
+        campaign_status: "Statut de la campagne",
       },
       empty: {
         description: "Il semble que la liste de vos entreprises soit vide.",
@@ -88,6 +89,7 @@ export const frenchCrmMessages = {
         background: "Informations de contexte",
         has_newsletter: "Abonné à la newsletter",
         sales_id: "Responsable de compte",
+        campaign_status: "Statut de la campagne",
       },
       action: {
         add: "Ajouter un contact",

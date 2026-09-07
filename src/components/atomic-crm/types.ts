@@ -69,6 +69,7 @@ export type Company = {
   context_links?: string[];
   nb_contacts?: number;
   nb_deals?: number;
+  campaign_status?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type EmailAndType = {
@@ -100,6 +101,7 @@ export type Contact = {
   phone_jsonb: PhoneNumberAndType[];
   nb_tasks?: number;
   company_name?: string;
+  campaign_status?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {
