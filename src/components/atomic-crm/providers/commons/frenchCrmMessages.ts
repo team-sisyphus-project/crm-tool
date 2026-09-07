@@ -429,6 +429,8 @@ export const frenchCrmMessages = {
       at_company: "chez",
       to: "à",
       load_more: "Charger plus d'activité",
+      expand: "Afficher la note complète",
+      collapse: "Masquer la note complète",
     },
     dashboard: {
       deals_chart: "Revenus des affaires à venir",

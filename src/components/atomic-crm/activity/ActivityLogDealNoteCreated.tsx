@@ -28,7 +28,7 @@ export function ActivityLogDealNoteCreated({
   return (
     <ActivityLogNote
       header={
-        <div className="flex flex-row items-start gap-2 flex-grow">
+        <div className="flex flex-row items-center gap-2 flex-grow min-w-0">
           <ReferenceField
             source="deal_id"
             reference="deals"
@@ -44,7 +44,7 @@ export function ActivityLogDealNoteCreated({
             </ReferenceField>
           </ReferenceField>
 
-          <span className="text-muted-foreground text-sm flex-grow">
+          <span className="text-muted-foreground text-sm flex-grow min-w-0 truncate">
             {translate(
               isCurrentUser
                 ? "crm.activity.you_added_note_about_deal"
@@ -79,7 +79,7 @@ export function ActivityLogDealNoteCreated({
           </span>
 
           {context === "company" && (
-            <span className="text-muted-foreground text-sm">
+            <span className="text-muted-foreground text-sm shrink-0">
               <RelativeDate date={activity.date} />
             </span>
           )}

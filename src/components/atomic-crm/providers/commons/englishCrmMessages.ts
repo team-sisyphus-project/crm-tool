@@ -423,6 +423,8 @@ export const englishCrmMessages = {
       at_company: "at",
       to: "to",
       load_more: "Load more activity",
+      expand: "Show full note",
+      collapse: "Hide full note",
     },
     dashboard: {
       deals_chart: "Upcoming Deal Revenue",

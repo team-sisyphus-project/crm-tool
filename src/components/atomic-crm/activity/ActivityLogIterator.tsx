@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import {
   useListContext,
   useInfinitePaginationContext,
@@ -6,7 +5,6 @@ import {
 } from "ra-core";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/admin/spinner";
 import { RotateCcw } from "lucide-react";
@@ -35,15 +33,14 @@ export function ActivityLogIterator() {
 
   if (isPending) {
     return (
-      <div className="mt-1">
+      <div className="space-y-1">
         {Array.from({ length: 5 }).map((_, index) => (
-          <div className="space-y-2 mt-1" key={index}>
-            <div className="flex flex-row space-x-2 items-center">
-              <Skeleton className="w-5 h-5 rounded-full" />
-              <Skeleton className="w-full h-4" />
-            </div>
-            <Skeleton className="w-full h-12" />
-            <Separator />
+          <div
+            className="flex flex-row gap-2 items-center px-2 py-1"
+            key={index}
+          >
+            <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+            <Skeleton className="w-full h-4" />
           </div>
         ))}
       </div>
@@ -69,12 +66,9 @@ export function ActivityLogIterator() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {data?.map((activity, index) => (
-        <Fragment key={index}>
-          <ActivityItem activity={activity} />
-          {index < data.length - 1 && <Separator />}
-        </Fragment>
+        <ActivityItem key={index} activity={activity} />
       ))}
 
       {/* Desktop: explicit Load More button */}
@@ -85,7 +79,7 @@ export function ActivityLogIterator() {
             e.preventDefault();
             fetchNextPage();
           }}
-          className="flex w-full justify-center text-sm underline hover:no-underline"
+          className="flex w-full justify-center mt-2 text-sm underline hover:no-underline"
         >
           {isFetchingNextPage ? (
             <Spinner />
@@ -97,7 +91,7 @@ export function ActivityLogIterator() {
 
       {/* Mobile: auto-load on scroll via IntersectionObserver */}
       {isMobile && (
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-2">
           <InfinitePagination />
         </div>
       )}
