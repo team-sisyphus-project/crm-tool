@@ -355,6 +355,10 @@ export const frenchCrmMessages = {
         with_pending: "Avec des tâches en attente",
       },
       regarding_contact: "(Concernant : %{name})",
+      urgency: {
+        overdue: "En retard",
+        due_today: "Échéance aujourd'hui",
+      },
       updated: "Tâche mise à jour",
     },
     tags: {

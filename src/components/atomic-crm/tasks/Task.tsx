@@ -19,10 +19,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { cn } from "@/lib/utils";
+
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Contact, Task as TData } from "../types";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
+import { isDueToday, isOverdue } from "./tasksPredicate";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Task = ({
@@ -88,9 +91,27 @@ export const Task = ({
 
   const labelId = `checkbox-list-label-${task.id}`;
 
+  // A completed task is never urgent: it no longer asks anything of the reader.
+  const isCompleted = !!task.done_date;
+  const isTaskOverdue = !isCompleted && isOverdue(task.due_date);
+  const isTaskDueToday = !isCompleted && isDueToday(task.due_date);
+  const isUrgent = isTaskOverdue || isTaskDueToday;
+  const urgencyLabel = isTaskOverdue
+    ? translate("resources.tasks.urgency.overdue")
+    : isTaskDueToday
+      ? translate("resources.tasks.urgency.due_today")
+      : null;
+
   return (
     <>
-      <div className="flex items-start justify-between">
+      <div
+        className={cn(
+          "flex items-start justify-between rounded-r-sm border-l-2 py-1 pl-2",
+          isUrgent
+            ? "border-destructive bg-destructive/10"
+            : "border-transparent",
+        )}
+      >
         <div
           className="flex items-start gap-2 flex-1"
           onClick={isMobile ? handleCheck() : undefined}
@@ -102,7 +123,13 @@ export const Task = ({
             disabled={isUpdatePending}
             className="mt-1"
           />
-          <div className={`flex-grow ${task.done_date ? "line-through" : ""}`}>
+          <div
+            className={cn(
+              "flex-grow",
+              isCompleted && "line-through",
+              isUrgent && "text-destructive",
+            )}
+          >
             <div className="text-sm">
               {task.type && task.type !== "none" && (
                 <>
@@ -125,6 +152,14 @@ export const Task = ({
               {translate("resources.tasks.fields.due_short")}
               &nbsp;
               <DateField source="due_date" record={task} showDate showTime />
+              {urgencyLabel && (
+                <>
+                  {" "}
+                  <span className="text-xs font-medium text-destructive">
+                    {urgencyLabel}
+                  </span>
+                </>
+              )}
               {showContact && (
                 <ReferenceField<TData, Contact>
                   source="contact_id"

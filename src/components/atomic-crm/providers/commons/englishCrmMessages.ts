@@ -349,6 +349,10 @@ export const englishCrmMessages = {
         with_pending: "With pending tasks",
       },
       regarding_contact: "(Re: %{name})",
+      urgency: {
+        overdue: "Overdue",
+        due_today: "Due today",
+      },
       updated: "Task updated",
     },
     tags: {
