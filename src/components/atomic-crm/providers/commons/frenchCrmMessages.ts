@@ -435,6 +435,9 @@ export const frenchCrmMessages = {
       load_more: "Charger plus d'activité",
       expand: "Afficher la note complète",
       collapse: "Masquer la note complète",
+      today: "Aujourd'hui",
+      yesterday: "Hier",
+      entry_count: "%{smart_count} entrée |||| %{smart_count} entrées",
     },
     dashboard: {
       deals_chart: "Revenus des affaires à venir",

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   useListContext,
   useInfinitePaginationContext,
@@ -21,6 +22,8 @@ import { ActivityLogContactCreated } from "./ActivityLogContactCreated";
 import { ActivityLogContactNoteCreated } from "./ActivityLogContactNoteCreated";
 import { ActivityLogDealCreated } from "./ActivityLogDealCreated";
 import { ActivityLogDealNoteCreated } from "./ActivityLogDealNoteCreated";
+import { ActivityLogDayGroup } from "./ActivityLogDayGroup";
+import { groupActivitiesByDay } from "./activityDayGroups";
 import { InfinitePagination } from "../misc/InfinitePagination";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -30,6 +33,10 @@ export function ActivityLogIterator() {
   const { hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfinitePaginationContext();
   const translate = useTranslate();
+
+  // The timeline reads day by day: only the most recent day stays open, older
+  // days fold away so the panel shows what is new instead of everything.
+  const dayGroups = useMemo(() => groupActivitiesByDay(data ?? []), [data]);
 
   if (isPending) {
     return (
@@ -66,9 +73,18 @@ export function ActivityLogIterator() {
   }
 
   return (
-    <div className="space-y-1">
-      {data?.map((activity, index) => (
-        <ActivityItem key={index} activity={activity} />
+    <div className="space-y-2">
+      {dayGroups.map((dayGroup, index) => (
+        <ActivityLogDayGroup
+          key={dayGroup.key}
+          date={dayGroup.date}
+          count={dayGroup.items.length}
+          defaultOpen={index === 0}
+        >
+          {dayGroup.items.map((activity, itemIndex) => (
+            <ActivityItem key={activity.id ?? itemIndex} activity={activity} />
+          ))}
+        </ActivityLogDayGroup>
       ))}
 
       {/* Desktop: explicit Load More button */}

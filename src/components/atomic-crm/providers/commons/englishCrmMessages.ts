@@ -429,6 +429,9 @@ export const englishCrmMessages = {
       load_more: "Load more activity",
       expand: "Show full note",
       collapse: "Hide full note",
+      today: "Today",
+      yesterday: "Yesterday",
+      entry_count: "%{smart_count} entry |||| %{smart_count} entries",
     },
     dashboard: {
       deals_chart: "Upcoming Deal Revenue",
