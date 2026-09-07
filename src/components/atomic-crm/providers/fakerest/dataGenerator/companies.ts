@@ -8,8 +8,11 @@ import {
   random,
 } from "faker/locale/en_US";
 
-import { randomDate } from "./utils";
-import { defaultCompanySectors } from "../../../root/defaultConfiguration";
+import { randomDate, weightedBoolean } from "./utils";
+import {
+  defaultCampaignStatuses,
+  defaultCompanySectors,
+} from "../../../root/defaultConfiguration";
 import type { Company, RAFile } from "../../../types";
 import type { Db } from "./types";
 
@@ -48,8 +51,12 @@ export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
       tax_identifier: random.alphaNumeric(10),
       country: random.arrayElement(["USA", "France", "UK"]),
       context_links: [],
-      // No campaign vocabulary exists yet, so demo companies start unassigned.
-      campaign_status: null,
+      // Most demo records carry a campaign state so the color-coded badge is
+      // visible at a glance; the rest stay unassigned to exercise its "not
+      // set" rendering.
+      campaign_status: weightedBoolean(80)
+        ? random.arrayElement(defaultCampaignStatuses).value
+        : null,
     };
   });
 };

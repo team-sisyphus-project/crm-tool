@@ -7,7 +7,10 @@ import {
   random,
 } from "faker/locale/en_US";
 
-import { defaultNoteStatuses } from "../../../root/defaultConfiguration";
+import {
+  defaultCampaignStatuses,
+  defaultNoteStatuses,
+} from "../../../root/defaultConfiguration";
 import { contactGender } from "../../../contacts/contactModel";
 import type { Company, Contact } from "../../../types";
 import type { Db } from "./types";
@@ -96,8 +99,12 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       sales_id: company.sales_id!,
       nb_tasks: 0,
       linkedin_url: null,
-      // No campaign vocabulary exists yet, so demo contacts start unassigned.
-      campaign_status: null,
+      // Most demo records carry a campaign state so the color-coded badge is
+      // visible at a glance; the rest stay unassigned to exercise its "not
+      // set" rendering.
+      campaign_status: weightedBoolean(80)
+        ? random.arrayElement(defaultCampaignStatuses).value
+        : null,
     };
   });
 };
