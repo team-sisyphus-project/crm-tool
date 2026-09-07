@@ -223,6 +223,15 @@ export interface NoteStatus extends LabeledValue {
   color: string;
 }
 
+/**
+ * A campaign lifecycle state. `color` is a CSS color the UI paints the status
+ * surface with — a `var(--status-*)` token reference, so light/dark themes
+ * resolve it themselves.
+ */
+export interface CampaignStatus extends LabeledValue {
+  color: string;
+}
+
 export interface ContactGender {
   value: string;
   label: string;

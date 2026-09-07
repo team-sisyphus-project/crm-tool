@@ -59,6 +59,7 @@ import {
   defaultDealStages,
   defaultLightModeLogo,
   defaultNoteStatuses,
+  defaultCampaignStatuses,
   defaultTaskTypes,
   defaultTitle,
 } from "./defaultConfiguration";
@@ -105,6 +106,7 @@ export type CRMProps = {
  * @param {string} darkModeLogo - Logo shown in dark mode and on the auth pages. Must be an imported asset, an absolute URL, or a data URI — never a route-relative path like "./logos/x.svg", which breaks on nested routes such as /oauth/consent (issue #291).
  * @param {string} lightModeLogo - Logo shown in light mode. Same rule as darkModeLogo: imported asset, absolute URL, or data URI only.
  * @param {NoteStatus[]} noteStatuses - The statuses of notes used in the application.
+ * @param {CampaignStatus[]} campaignStatuses - The campaign lifecycle states (with their colors) used in the application.
  * @param {LabeledValue[]} taskTypes - The types of tasks used in the application.
  * @param {string} title - The title of the CRM application.
  *
@@ -173,6 +175,7 @@ const CRMApp = ({
   darkModeLogo = defaultDarkModeLogo,
   lightModeLogo = defaultLightModeLogo,
   noteStatuses = defaultNoteStatuses,
+  campaignStatuses = defaultCampaignStatuses,
   taskTypes = defaultTaskTypes,
   title = defaultTitle,
   dataProvider = defaultDataProviderBuilder(),
@@ -207,6 +210,7 @@ const CRMApp = ({
         dealPipelineStatuses,
         dealStages,
         noteStatuses,
+        campaignStatuses,
         taskTypes,
         title,
         darkModeLogo,

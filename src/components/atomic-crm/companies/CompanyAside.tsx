@@ -12,6 +12,7 @@ import { TextField } from "@/components/admin/text-field";
 import { UrlField } from "@/components/admin/url-field";
 import { SelectField } from "@/components/admin/select-field";
 
+import { CampaignStatusBadge } from "../misc/CampaignStatusBadge";
 import { formatLocalizedDate } from "../misc/RelativeDate";
 import { AsideSection } from "../misc/AsideSection";
 import { useConfigurationContext } from "../root/ConfigurationContext";
@@ -141,6 +142,10 @@ export const ContextInfo = ({ record }: { record: Company }) => {
           <TextField source="revenue" />
         </span>
       )}
+      <span className="flex flex-row items-center gap-1">
+        {translate("resources.companies.fields.campaign_status")}:{" "}
+        <CampaignStatusBadge value={record.campaign_status} />
+      </span>
       {record.tax_identifier && (
         <span>
           {translate("resources.companies.fields.tax_identifier", {})}

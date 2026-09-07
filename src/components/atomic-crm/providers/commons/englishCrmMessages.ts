@@ -391,6 +391,9 @@ export const englishCrmMessages = {
       },
       welcome_title: "Welcome to Atomic CRM",
     },
+    campaign_status: {
+      not_set: "Not set",
+    },
     common: {
       activity: "Activity",
       added: "added",

@@ -6,6 +6,7 @@ import {
   WithRecord,
 } from "ra-core";
 import { TextField } from "@/components/admin/text-field";
+import { CampaignStatusBadge } from "../misc/CampaignStatusBadge";
 import { formatLocalizedDate } from "../misc/RelativeDate";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import type { Contact } from "../types";
@@ -38,6 +39,13 @@ export const ContactBackgroundInfo = () => {
           ) : null
         }
       />
+      <div className="flex flex-row items-center gap-1 text-muted-foreground md:py-0.5">
+        <span className="text-sm">
+          {translate("resources.contacts.fields.campaign_status")}:
+        </span>
+        <CampaignStatusBadge value={record.campaign_status} />
+      </div>
+
       <div className="text-muted-foreground md:py-0.5">
         <span className="text-sm">
           {translate("resources.contacts.background.added_on", {

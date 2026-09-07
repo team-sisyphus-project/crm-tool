@@ -52,6 +52,14 @@ export const defaultNoteStatuses = [
   { value: "in-contract", label: "In Contract", color: "#a4e87d" },
 ];
 
+// Campaign lifecycle vocabulary. Colors reference the semantic --status-*
+// tokens declared in src/index.css so both themes resolve them.
+export const defaultCampaignStatuses = [
+  { value: "planning", label: "Planning", color: "var(--status-planning)" },
+  { value: "active", label: "Active", color: "var(--status-active)" },
+  { value: "completed", label: "Completed", color: "var(--status-completed)" },
+];
+
 export const defaultTaskTypes = [
   { value: "none", label: "None" },
   { value: "email", label: "Email" },
@@ -71,6 +79,7 @@ export const defaultConfiguration: ConfigurationContextValue = {
   dealPipelineStatuses: defaultDealPipelineStatuses,
   dealStages: defaultDealStages,
   noteStatuses: defaultNoteStatuses,
+  campaignStatuses: defaultCampaignStatuses,
   taskTypes: defaultTaskTypes,
   title: defaultTitle,
   darkModeLogo: defaultDarkModeLogo,
