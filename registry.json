@@ -46,6 +46,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/tasks/taskPriority.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/tasks/TasksListFilter.tsx",
           "type": "registry:component"
         },
