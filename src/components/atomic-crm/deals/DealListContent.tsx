@@ -14,9 +14,13 @@ import { useEffect, useState } from "react";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal, DealStage } from "../types";
 import { DealColumn } from "./DealColumn";
-import { buildStageChangeNoteText } from "./dealUtils";
+import {
+  STAGE_MOVE_ERROR_KEY,
+  buildStageChangeNoteText,
+  findDealLabel,
+} from "./dealUtils";
 import type { DealsByStage } from "./stages";
-import { getDealsByStage } from "./stages";
+import { getDealsByStage, moveDealInBoard } from "./stages";
 
 export const DealListContent = () => {
   const { dealStages } = useConfigurationContext();
@@ -66,43 +70,58 @@ export const DealListContent = () => {
       index: undefined, // undefined if dropped after the last item
     };
 
+    // The board as the user last saw it, kept so a move that fails to persist
+    // can be put back instead of leaving the columns (and the amount totals
+    // computed from them) showing a move the server never accepted.
+    const boardBeforeMove = dealsByStage;
+
     // compute local state change synchronously
     setDealsByStage(
-      updateDealStageLocal(
+      moveDealInBoard(
+        dealsByStage,
         sourceDeal,
         { stage: sourceStage, index: source.index },
         { stage: destinationStage, index: destination.index },
-        dealsByStage,
       ),
     );
 
-    // persist the changes
-    updateDealStage(sourceDeal, destinationDeal, dataProvider)
-      .then(async () => {
-        if (sourceStage === destinationStage) return;
-        // The stage move is already persisted: a failing note must not undo it,
-        // so the failure is reported and the board still refreshes.
-        try {
-          await logStageChange(
-            {
-              deal: sourceDeal,
-              fromStage: sourceStage,
-              toStage: destinationStage,
-              salesId: identity?.id,
-              dealStages,
-              translate,
-            },
-            dataProvider,
-          );
-        } catch {
-          notify("resources.deals.stage_change_note_error", {
-            type: "warning",
-          });
+    // persist the changes. The rejection handler is attached to this call only,
+    // so it reports a move that did not happen — never a later refresh hiccup.
+    updateDealStage(sourceDeal, destinationDeal, dataProvider).then(
+      async () => {
+        if (sourceStage !== destinationStage) {
+          // The stage move is already persisted: a failing note must not undo
+          // it, so the failure is reported and the board still refreshes.
+          try {
+            await logStageChange(
+              {
+                deal: sourceDeal,
+                fromStage: sourceStage,
+                toStage: destinationStage,
+                salesId: identity?.id,
+                dealStages,
+                translate,
+              },
+              dataProvider,
+            );
+          } catch {
+            notify("resources.deals.stage_change_note_error", {
+              type: "warning",
+            });
+          }
         }
-      })
-      .then(() => {
         refetch();
-      });
+      },
+      () => {
+        setDealsByStage(boardBeforeMove);
+        notify(STAGE_MOVE_ERROR_KEY, {
+          type: "error",
+          messageArgs: {
+            stage: findDealLabel(dealStages, sourceStage) ?? sourceStage,
+          },
+        });
+      },
+    );
   };
 
   return (
@@ -153,42 +172,6 @@ const logStageChange = async (
       sales_id: salesId,
     },
   });
-};
-
-const updateDealStageLocal = (
-  sourceDeal: Deal,
-  source: { stage: string; index: number },
-  destination: {
-    stage: string;
-    index?: number; // undefined if dropped after the last item
-  },
-  dealsByStage: DealsByStage,
-) => {
-  if (source.stage === destination.stage) {
-    // moving deal inside the same column
-    const column = dealsByStage[source.stage];
-    column.splice(source.index, 1);
-    column.splice(destination.index ?? column.length + 1, 0, sourceDeal);
-    return {
-      ...dealsByStage,
-      [destination.stage]: column,
-    };
-  } else {
-    // moving deal across columns
-    const sourceColumn = dealsByStage[source.stage];
-    const destinationColumn = dealsByStage[destination.stage];
-    sourceColumn.splice(source.index, 1);
-    destinationColumn.splice(
-      destination.index ?? destinationColumn.length + 1,
-      0,
-      sourceDeal,
-    );
-    return {
-      ...dealsByStage,
-      [source.stage]: sourceColumn,
-      [destination.stage]: destinationColumn,
-    };
-  }
 };
 
 const updateDealStage = async (

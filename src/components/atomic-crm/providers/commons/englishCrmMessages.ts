@@ -236,6 +236,7 @@ export const englishCrmMessages = {
       stage_change_note: "Stage changed from %{from} to %{to}",
       stage_change_note_error:
         "The deal moved, but the stage change could not be logged",
+      stage_move_error: "The deal could not be moved, and stayed in %{stage}",
       invalid_date: "Invalid date",
     },
     notes: {

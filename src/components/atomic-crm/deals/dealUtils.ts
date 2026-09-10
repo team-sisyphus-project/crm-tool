@@ -57,6 +57,13 @@ export function formatISODateString(dateString: string) {
  */
 export const STAGE_CHANGE_NOTE_KEY = "resources.deals.stage_change_note";
 
+/**
+ * Translation key for the notification shown when a deal move cannot be
+ * persisted and the board is rolled back. Exported so the message catalogs and
+ * the tests share a single source.
+ */
+export const STAGE_MOVE_ERROR_KEY = "resources.deals.stage_move_error";
+
 type TranslateStageChange = (
   key: string,
   options: { from: string; to: string },

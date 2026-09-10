@@ -5,6 +5,7 @@ import type { DealStage } from "../types";
 import { frenchCrmMessages } from "../providers/commons/frenchCrmMessages";
 import {
   DEAL_COUNT_KEY,
+  STAGE_MOVE_ERROR_KEY,
   buildStageChangeNoteText,
   formatDealAmount,
   formatISODateString,
@@ -178,5 +179,21 @@ describe("deal count label", () => {
 
   it("is translated in the French catalog too", () => {
     expect(frenchCrmMessages.resources.deals.nb_deals).toContain("||||");
+  });
+});
+
+describe("stage move failure notification", () => {
+  it("names the stage the deal stayed in", () => {
+    expect(
+      testI18nProvider.translate(STAGE_MOVE_ERROR_KEY, {
+        stage: "Opportunity",
+      }),
+    ).toBe("The deal could not be moved, and stayed in Opportunity");
+  });
+
+  it("is translated in the French catalog too", () => {
+    expect(frenchCrmMessages.resources.deals.stage_move_error).toContain(
+      "%{stage}",
+    );
   });
 });
