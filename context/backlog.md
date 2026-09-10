@@ -28,3 +28,9 @@ Verified in grain-3 despite this:
 The DOM tests added in grain-3 (`ContactImportDialog.test.tsx`) are unrun here
 and must be run on a machine that has the browser's system dependencies
 installed.
+
+The same applies to the DOM tests added in grain-4 (three more cases in
+`ContactImportDialog.test.tsx`, covering the duplicate-policy choice). The
+grain's logic is also covered by two node-runnable suites that were run here
+(`import/duplicates.test.ts`, `useContactImport.test.ts` — 40 tests green), so
+the browser suite is corroboration, not the only proof.

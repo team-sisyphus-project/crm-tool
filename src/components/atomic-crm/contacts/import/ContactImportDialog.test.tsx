@@ -1,9 +1,14 @@
 import { userEvent } from "@vitest/browser/context";
-import type { CreateParams, DataProvider, RaRecord } from "ra-core";
+import type {
+  CreateParams,
+  DataProvider,
+  RaRecord,
+  UpdateParams,
+} from "ra-core";
 import type { ReactElement } from "react";
 import { render } from "vitest-browser-react";
 
-import { StoryWrapper } from "@/test/StoryWrapper";
+import { buildContact, StoryWrapper } from "@/test/StoryWrapper";
 
 import { ContactImportButton } from "./ContactImportButton";
 import { ImportWizard } from "./ContactImportDialog.stories";
@@ -29,19 +34,30 @@ const csvFile = () =>
 const misHeaderedCsvFile = () =>
   new File([MIS_HEADERED_CSV], "export.csv", { type: "text/csv" });
 
-/** Records what the app asks the backend to create, per resource. */
+/** Records what the app asks the backend to write, per resource. */
 const createRecorder = () => {
   const created: Record<string, RaRecord[]> = {};
+  const updated: Record<string, RaRecord[]> = {};
   let nextId = 1;
   const create = async (resource: string, params: CreateParams) => {
     const record = { ...params.data, id: nextId++ };
     created[resource] = [...(created[resource] ?? []), record];
     return { data: record };
   };
-  // `DataProvider["create"]` is generic over the record type it returns; this
-  // stub answers with whatever it was handed, which no single instantiation of
-  // that signature can express.
-  return { created, create: create as DataProvider["create"] };
+  const update = async (resource: string, params: UpdateParams) => {
+    const record = { ...params.data, id: params.id };
+    updated[resource] = [...(updated[resource] ?? []), record];
+    return { data: record };
+  };
+  // `DataProvider["create"]` / `["update"]` are generic over the record type
+  // they return; these stubs answer with whatever they were handed, which no
+  // single instantiation of those signatures can express.
+  return {
+    created,
+    updated,
+    create: create as DataProvider["create"],
+    update: update as DataProvider["update"],
+  };
 };
 
 const openWizard = async (ui: ReactElement = <ImportWizard />) => {
@@ -93,6 +109,19 @@ const mapColumnTo = async (
     .getByText(fieldLabel, { exact: true })
     .click();
 };
+
+/** The CRM already knows Ada, under the address the file carries for her. */
+const knownContact = () => ({
+  contacts: [
+    buildContact({
+      id: 1,
+      first_name: "Ada",
+      last_name: "Lovelace",
+      title: "CTO",
+      email_jsonb: [{ email: "Ada@Example.com", type: "Work" as const }],
+    }),
+  ],
+});
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -361,5 +390,75 @@ describe("ContactImportDialog", () => {
         (contact) => !("Loyalty points" in contact),
       ),
     ).toBe(true);
+  });
+
+  it("offers to leave contacts already in the CRM alone, by default", async () => {
+    const screen = await openWizard();
+
+    await goToMappingStep(screen, csvFile());
+
+    await expect
+      .element(screen.getByRole("radio", { name: "Leave them untouched" }))
+      .toBeChecked();
+    await expect
+      .element(
+        screen.getByRole("radio", { name: "Update them from this file" }),
+      )
+      .not.toBeChecked();
+  });
+
+  it("does not import a row whose email is already in the CRM", async () => {
+    const recorder = createRecorder();
+    const screen = await openWizard(
+      <StoryWrapper
+        data={knownContact()}
+        dataProvider={{ create: recorder.create, update: recorder.update }}
+      >
+        <ContactImportButton />
+      </StoryWrapper>,
+    );
+    await goToMappingStep(screen, csvFile());
+
+    await screen.getByRole("button", { name: "Start import" }).click();
+
+    await expect
+      .element(
+        screen.getByText("1 created, 0 updated, 1 skipped as duplicates."),
+      )
+      .toBeVisible();
+    expect(
+      recorder.created.contacts?.map(({ first_name }) => first_name),
+    ).toEqual(["Grace"]);
+    expect(recorder.updated.contacts).toBeUndefined();
+  });
+
+  it("updates the contact already in the CRM when asked to", async () => {
+    const recorder = createRecorder();
+    const screen = await openWizard(
+      <StoryWrapper
+        data={knownContact()}
+        dataProvider={{ create: recorder.create, update: recorder.update }}
+      >
+        <ContactImportButton />
+      </StoryWrapper>,
+    );
+    await goToMappingStep(screen, csvFile());
+
+    await screen
+      .getByRole("radio", { name: "Update them from this file" })
+      .click();
+    await screen.getByRole("button", { name: "Start import" }).click();
+
+    await expect
+      .element(
+        screen.getByText("1 created, 1 updated, 0 skipped as duplicates."),
+      )
+      .toBeVisible();
+    expect(recorder.updated.contacts).toEqual([
+      { id: 1, first_name: "Ada", last_name: "Lovelace" },
+    ]);
+    expect(
+      recorder.created.contacts?.map(({ first_name }) => first_name),
+    ).toEqual(["Grace"]);
   });
 });

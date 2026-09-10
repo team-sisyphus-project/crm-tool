@@ -9,6 +9,8 @@ import {
   missingRequiredFields,
   setColumnField,
 } from "./columnMapping";
+import type { DuplicatePolicy } from "./duplicates";
+import { DEFAULT_DUPLICATE_POLICY } from "./duplicates";
 import { useContactImport } from "../useContactImport";
 
 /** Number of contacts sent to the data provider per round-trip. */
@@ -68,11 +70,12 @@ const toStep = (source: SourceState, importerState: string): ImportStep => {
  * derived step so the dialog only has to render.
  */
 export function useContactImportWizard() {
-  const processBatch = useContactImport();
-  // The mapping in force for the import currently running. Held in a ref so
-  // editing the mapping does not rebuild the parser's batch callback, and so a
-  // running import keeps the mapping it was started with.
+  const { processBatch, outcomes, startRun } = useContactImport();
+  // The mapping and duplicate policy in force for the import currently running.
+  // Held in refs so editing either does not rebuild the parser's batch callback,
+  // and so a running import keeps the settings it was started with.
   const activeMappingRef = useRef<ColumnMapping | null>(null);
+  const activePolicyRef = useRef<DuplicatePolicy>(DEFAULT_DUPLICATE_POLICY);
 
   const processMappedBatch = useCallback(
     async (batch: CsvRow[]) => {
@@ -80,7 +83,10 @@ export function useContactImportWizard() {
       if (mapping === null) {
         throw new Error("The import started without a column mapping.");
       }
-      await processBatch(batch.map((row) => applyMapping(row, mapping)));
+      await processBatch(
+        batch.map((row) => applyMapping(row, mapping)),
+        activePolicyRef.current,
+      );
     },
     [processBatch],
   );
@@ -91,6 +97,11 @@ export function useContactImportWizard() {
   });
 
   const [source, setSource] = useState<SourceState>({ status: "empty" });
+  // What to do with rows matching a contact already in the CRM. One choice for
+  // the whole run, made before it starts.
+  const [duplicatePolicy, setDuplicatePolicy] = useState<DuplicatePolicy>(
+    DEFAULT_DUPLICATE_POLICY,
+  );
   // Guards against a slow preview of a discarded file overwriting a newer one.
   const readIdRef = useRef(0);
 
@@ -161,8 +172,10 @@ export function useContactImportWizard() {
     if (source.status !== "ready" || source.mapping === null) return;
     if (missingRequiredFields(source.mapping).length > 0) return;
     activeMappingRef.current = source.mapping;
+    activePolicyRef.current = duplicatePolicy;
+    startRun();
     parseCsv(source.file);
-  }, [parseCsv, source]);
+  }, [duplicatePolicy, parseCsv, source, startRun]);
 
   /** Back to the upload step: the selection is dropped so both stay in sync. */
   const goToUpload = useCallback(() => {
@@ -179,8 +192,10 @@ export function useContactImportWizard() {
   const resetWizard = useCallback(() => {
     readIdRef.current += 1;
     activeMappingRef.current = null;
+    activePolicyRef.current = DEFAULT_DUPLICATE_POLICY;
     reset();
     setSource({ status: "empty" });
+    setDuplicatePolicy(DEFAULT_DUPLICATE_POLICY);
   }, [reset]);
 
   const step = toStep(source, importer.state);
@@ -195,6 +210,9 @@ export function useContactImportWizard() {
       mapping,
       missingFields,
       canStartImport,
+      duplicatePolicy,
+      setDuplicatePolicy,
+      outcomes,
       isReadingFile: source.status === "reading",
       previewError: source.status === "invalid" ? source.error : null,
       selectFile,
@@ -213,6 +231,8 @@ export function useContactImportWizard() {
       mapping,
       missingFields,
       canStartImport,
+      duplicatePolicy,
+      outcomes,
       selectFile,
       goToMapping,
       goToPreview,

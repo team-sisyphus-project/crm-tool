@@ -134,6 +134,17 @@ export const englishCrmMessages = {
         mapping_missing:
           "No column feeds %{fields} yet. Pick a column for it to start the import.",
         field_required: "%{field} (required)",
+        duplicates_title: "Contacts already in your CRM",
+        duplicates_hint:
+          "A row is matched to a contact when they share an email address.",
+        duplicates_skip: "Leave them untouched",
+        duplicates_skip_hint:
+          "The row is counted as a duplicate and nothing is written.",
+        duplicates_update: "Update them from this file",
+        duplicates_update_hint:
+          "The values in your file are written onto the contact. Emails, phone numbers and tags are added to the ones they already have; nothing is removed.",
+        outcomes:
+          "%{created} created, %{updated} updated, %{skipped} skipped as duplicates.",
         fields: {
           first_name: "First name",
           last_name: "Last name",

@@ -754,6 +754,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/import/duplicates.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/contacts/import/columnMapping.ts",
           "type": "registry:component"
         },
@@ -779,6 +783,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/import/ImportMappingStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportDuplicatePolicy.tsx",
           "type": "registry:component"
         },
         {

@@ -137,6 +137,17 @@ export const frenchCrmMessages = {
         mapping_missing:
           "Aucune colonne n'alimente %{fields} pour le moment. Choisissez-en une pour lancer l'import.",
         field_required: "%{field} (obligatoire)",
+        duplicates_title: "Contacts déjà présents dans votre CRM",
+        duplicates_hint:
+          "Une ligne correspond à un contact lorsqu'ils partagent une adresse e-mail.",
+        duplicates_skip: "Les laisser tels quels",
+        duplicates_skip_hint:
+          "La ligne est comptée comme doublon et rien n'est écrit.",
+        duplicates_update: "Les mettre à jour depuis ce fichier",
+        duplicates_update_hint:
+          "Les valeurs de votre fichier sont écrites sur le contact. Les e-mails, téléphones et étiquettes s'ajoutent à ceux qu'il a déjà ; rien n'est supprimé.",
+        outcomes:
+          "%{created} créés, %{updated} mis à jour, %{skipped} ignorés car doublons.",
         fields: {
           first_name: "Prénom",
           last_name: "Nom",

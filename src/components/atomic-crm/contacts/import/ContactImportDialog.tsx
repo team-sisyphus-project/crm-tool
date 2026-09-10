@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { ImportDuplicatePolicy } from "./ImportDuplicatePolicy";
 import { ImportMappingStep } from "./ImportMappingStep";
 import { ImportPreviewStep } from "./ImportPreviewStep";
 import { ImportRunningStep } from "./ImportRunningStep";
@@ -86,12 +87,18 @@ export function ContactImportDialog({
           )}
 
           {step === "mapping" && wizard.preview && wizard.mapping && (
-            <ImportMappingStep
-              preview={wizard.preview}
-              mapping={wizard.mapping}
-              missingFields={wizard.missingFields}
-              onColumnChange={wizard.mapColumn}
-            />
+            <>
+              <ImportMappingStep
+                preview={wizard.preview}
+                mapping={wizard.mapping}
+                missingFields={wizard.missingFields}
+                onColumnChange={wizard.mapColumn}
+              />
+              <ImportDuplicatePolicy
+                value={wizard.duplicatePolicy}
+                onChange={wizard.setDuplicatePolicy}
+              />
+            </>
           )}
 
           {step === "running" && importer.state === "running" && (
@@ -110,6 +117,7 @@ export function ContactImportDialog({
                 outcome="complete"
                 importCount={importer.importCount}
                 errorCount={importer.errorCount}
+                outcomes={wizard.outcomes}
               />
             ) : (
               <ImportSummaryStep outcome="error" />
