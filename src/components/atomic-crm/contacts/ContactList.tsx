@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/card";
 import type { Company, Contact, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";
 import { ContactEmpty } from "./ContactEmpty";
-import { ContactImportButton } from "./ContactImportButton";
+import { ContactImportButton } from "./import";
 import {
   ContactListContent,
   ContactListContentMobile,

@@ -113,7 +113,25 @@ export const frenchCrmMessages = {
       },
       import: {
         title: "Importer des contacts",
+        description:
+          "Choisissez un fichier CSV, vérifiez l'aperçu, puis importez vos contacts.",
         button: "Importer un fichier CSV",
+        start: "Lancer l'import",
+        back: "Retour",
+        steps: {
+          label: "Étapes de l'import",
+          upload: "Fichier",
+          preview: "Aperçu",
+          import: "Import",
+        },
+        reading: "Lecture de votre fichier...",
+        parse_error:
+          "Impossible de lire ce fichier. Vérifiez qu'il s'agit d'un fichier CSV valide avec une ligne d'en-tête.",
+        preview_title: "Aperçu de %{fileName}",
+        preview_hint:
+          "Affichage des %{rowCount} premières lignes, %{columnCount} colonnes détectées.",
+        preview_empty:
+          "Ce fichier contient une ligne d'en-tête mais aucun contact à importer.",
         complete:
           "Import des contacts terminé. %{importCount} contacts importés, %{errorCount} erreurs",
         progress:

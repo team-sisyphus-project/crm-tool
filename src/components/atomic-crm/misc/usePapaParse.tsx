@@ -142,3 +142,39 @@ export function usePapaParse<T>({
     [importer, parseCsv, reset],
   );
 }
+
+/** Headers and the first rows of a CSV file, read without importing anything. */
+export type CsvPreview = {
+  headers: string[];
+  rows: Record<string, string>[];
+};
+
+/**
+ * Reads the header row and the first `rowCount` data rows of a CSV file.
+ *
+ * Only the beginning of the file is parsed, so this stays cheap on large
+ * exports and never touches the data provider. Values are returned as raw
+ * strings (no `dynamicTyping`) because the preview shows the file as written.
+ */
+export function parseHeaders(file: File, rowCount = 5): Promise<CsvPreview> {
+  return new Promise((resolve, reject) => {
+    Papa.parse<Record<string, string>>(file, {
+      header: true,
+      skipEmptyLines: true,
+      preview: rowCount,
+      complete(results) {
+        const headers = (results.meta.fields ?? []).filter(
+          (header) => header.trim() !== "",
+        );
+        if (headers.length === 0) {
+          reject(new Error("The CSV file has no header row."));
+          return;
+        }
+        resolve({ headers, rows: results.data });
+      },
+      error(error) {
+        reject(error);
+      },
+    });
+  });
+}

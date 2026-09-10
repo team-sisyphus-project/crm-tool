@@ -10,7 +10,7 @@ import { Link } from "react-router";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ContactCreateSheet } from "../contacts/ContactCreateSheet";
-import { ContactImportButton } from "../contacts/ContactImportButton";
+import { ContactImportButton } from "../contacts/import";
 import useAppBarHeight from "../misc/useAppBarHeight";
 import { NoteCreateSheet } from "../notes/NoteCreateSheet";
 

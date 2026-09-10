@@ -706,10 +706,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/contacts/ContactImportButton.tsx",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/contacts/ContactEmpty.tsx",
           "type": "registry:component"
         },
@@ -743,6 +739,46 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/Avatar.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/useContactImportWizard.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/index.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/duration.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportUploadStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportSummaryStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportStepIndicator.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportRunningStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportPreviewStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ContactImportDialog.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ContactImportButton.tsx",
           "type": "registry:component"
         },
         {

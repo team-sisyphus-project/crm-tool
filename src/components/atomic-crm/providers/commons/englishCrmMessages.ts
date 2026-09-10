@@ -110,7 +110,24 @@ export const englishCrmMessages = {
       },
       import: {
         title: "Import contacts",
+        description:
+          "Upload a CSV file, check the preview, then import your contacts.",
         button: "Import CSV",
+        start: "Start import",
+        back: "Back",
+        steps: {
+          label: "Import steps",
+          upload: "Upload",
+          preview: "Preview",
+          import: "Import",
+        },
+        reading: "Reading your file...",
+        parse_error:
+          "Could not read this file. Please make sure it is a valid CSV file with a header row.",
+        preview_title: "Preview of %{fileName}",
+        preview_hint:
+          "Showing the first %{rowCount} rows, %{columnCount} columns detected.",
+        preview_empty: "This file has a header row but no contacts to import.",
         complete:
           "Contacts import complete. Imported %{importCount} contacts, with %{errorCount} errors",
         progress:
