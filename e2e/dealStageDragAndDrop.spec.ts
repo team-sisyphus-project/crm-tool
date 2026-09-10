@@ -108,7 +108,9 @@ test("user drags a deal to another stage column", async ({
     dealDialog.getByRole("heading", { name: DRAGGED_DEAL }),
   ).toBeVisible();
   // The move was persisted...
-  await expect(dealDialog.getByText(TARGET_STAGE.label)).toBeVisible();
+  await expect(
+    dealDialog.getByText(TARGET_STAGE.label, { exact: true }),
+  ).toBeVisible();
   // ...and the timeline records it exactly once.
   await expect(dealDialog.getByText(STAGE_CHANGE_NOTE)).toHaveCount(1);
   await expect(dealDialog.getByText(STAGE_CHANGE_NOTE)).toBeVisible();
