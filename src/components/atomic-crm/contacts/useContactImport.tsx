@@ -8,6 +8,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 
 import type { Company, Contact, Tag } from "../types";
 import type { DuplicatePolicy, ImportOutcomes } from "./import/duplicates";
+import { failureReason } from "./import/errorReport";
 import {
   addOutcomes,
   buildContactPatch,
@@ -128,13 +129,28 @@ const resolveTagIds = (
     .filter((tag): tag is Tag => !!tag)
     .map((tag) => tag.id as number);
 
+/** A row of the batch the CRM refused, by its position in that batch. */
+export type BatchRowFailure = {
+  index: number;
+  reason: string;
+};
+
+/** What one batch settled: how its rows ended up, and which ones did not. */
+export type ImportBatchResult = {
+  outcomes: ImportOutcomes;
+  failures: BatchRowFailure[];
+};
+
 /**
  * Writes one batch of rows, honouring the duplicate policy the user chose.
  *
  * Rows that match a contact already in the CRM are either left alone or patched
  * — never created a second time — and every row is counted under the outcome it
- * actually got. Exported (rather than kept inside the hook) so the policy can be
- * exercised against a data provider without rendering anything.
+ * actually got. A row the CRM refuses is reported as a failure and does not take
+ * the rest of the batch down with it: the ones that worked stay written, and the
+ * user gets the others back with a reason. Exported (rather than kept inside the
+ * hook) so the policy can be exercised against a data provider without rendering
+ * anything.
  */
 export async function importContactBatch({
   batch,
@@ -145,78 +161,104 @@ export async function importContactBatch({
   tags,
   salesId,
   today,
-}: ImportContactBatchParams): Promise<ImportOutcomes> {
+}: ImportContactBatchParams): Promise<ImportBatchResult> {
   const emails = [...new Set(batch.flatMap(rowEmails))];
   await findContactsByEmail(dataProvider, emails, run);
 
   const decisions = decideBatch(batch, run.matches, run.claimed, policy);
 
-  const outcomes = await Promise.all(
-    decisions.map(async (decision, index): Promise<keyof ImportOutcomes> => {
+  const results = await Promise.all(
+    decisions.map(async (decision, index): Promise<RowResult> => {
       const row = batch[index];
 
-      if (decision.action === "skip") return "skipped";
+      if (decision.action === "skip") return { outcome: "skipped" };
 
-      const companyId = resolveCompanyId(row, companies);
-      const tagIds = resolveTagIds(row, tags);
+      try {
+        const companyId = resolveCompanyId(row, companies);
+        const tagIds = resolveTagIds(row, tags);
 
-      if (decision.action === "update") {
-        const patch = buildContactPatch(row, decision.contact, {
-          companyId,
-          tagIds,
+        if (decision.action === "update") {
+          const patch = buildContactPatch(row, decision.contact, {
+            companyId,
+            tagIds,
+          });
+          // Nothing this row carries is new to the contact, so there is nothing
+          // to write: report it as left alone rather than as an empty update.
+          if (isEmptyPatch(patch)) return { outcome: "skipped" };
+
+          await dataProvider.update<Contact>("contacts", {
+            id: decision.contact.id,
+            data: patch,
+            previousData: decision.contact,
+          });
+          return { outcome: "updated" };
+        }
+
+        await dataProvider.create("contacts", {
+          data: {
+            first_name: row.first_name,
+            last_name: row.last_name,
+            gender: row.gender,
+            title: row.title,
+            email_jsonb: emailEntries(row),
+            phone_jsonb: phoneEntries(row),
+            background: row.background,
+            first_seen: row.first_seen
+              ? new Date(row.first_seen).toISOString()
+              : today,
+            last_seen: row.last_seen
+              ? new Date(row.last_seen).toISOString()
+              : today,
+            has_newsletter: row.has_newsletter,
+            status: row.status,
+            company_id: companyId,
+            tags: tagIds,
+            sales_id: salesId,
+            linkedin_url: row.linkedin_url,
+          },
         });
-        // Nothing this row carries is new to the contact, so there is nothing
-        // to write: report it as left alone rather than as an empty update.
-        if (isEmptyPatch(patch)) return "skipped";
-
-        await dataProvider.update<Contact>("contacts", {
-          id: decision.contact.id,
-          data: patch,
-          previousData: decision.contact,
-        });
-        return "updated";
+        return { outcome: "created" };
+      } catch (error) {
+        console.error("Failed to import a contact row", error);
+        return { outcome: "failed", error };
       }
-
-      await dataProvider.create("contacts", {
-        data: {
-          first_name: row.first_name,
-          last_name: row.last_name,
-          gender: row.gender,
-          title: row.title,
-          email_jsonb: emailEntries(row),
-          phone_jsonb: phoneEntries(row),
-          background: row.background,
-          first_seen: row.first_seen
-            ? new Date(row.first_seen).toISOString()
-            : today,
-          last_seen: row.last_seen
-            ? new Date(row.last_seen).toISOString()
-            : today,
-          has_newsletter: row.has_newsletter,
-          status: row.status,
-          company_id: companyId,
-          tags: tagIds,
-          sales_id: salesId,
-          linkedin_url: row.linkedin_url,
-        },
-      });
-      return "created";
     }),
   );
 
-  // Every email this batch touched is now the run's business: a later row
-  // repeating one of them is a duplicate inside the file, not a new contact.
-  for (const decision of decisions) {
+  // Every email a settled row touched is now the run's business: a later row
+  // repeating one of them is a duplicate inside the file, not a new contact. A
+  // row that failed settled nothing, so it keeps no claim — a later row with
+  // the same address is free to try again.
+  decisions.forEach((decision, index) => {
+    if (results[index].outcome === "failed") return;
     for (const email of decision.emails) {
       run.claimed.add(email);
     }
-  }
+  });
 
-  return outcomes.reduce(
-    (total, outcome) => ({ ...total, [outcome]: total[outcome] + 1 }),
+  const failures = results.flatMap((result, index) =>
+    result.outcome === "failed"
+      ? [{ index, reason: failureReason(result.error) }]
+      : [],
+  );
+
+  // Outcomes count the rows the CRM settled; a row it refused is counted by the
+  // failure list instead, which is the only place that also knows why.
+  const outcomes = results.reduce(
+    (total, result) =>
+      result.outcome === "failed"
+        ? total
+        : { ...total, [result.outcome]: total[result.outcome] + 1 },
     NO_IMPORT_OUTCOMES,
   );
+
+  return { outcomes, failures };
 }
+
+/** How one row of a batch settled, with the error when the CRM refused it. */
+type RowResult =
+  | { outcome: keyof ImportOutcomes; error?: undefined }
+  | { outcome: "failed"; error: unknown };
 
 export function useContactImport() {
   const today = new Date().toISOString();
@@ -285,7 +327,7 @@ export function useContactImport() {
         getTags(batch.flatMap((contact) => parseTags(contact.tags))),
       ]);
 
-      const batchOutcomes = await importContactBatch({
+      const { outcomes: batchOutcomes, failures } = await importContactBatch({
         batch,
         policy,
         dataProvider,
@@ -297,6 +339,7 @@ export function useContactImport() {
       });
 
       setOutcomes((previous) => addOutcomes(previous, batchOutcomes));
+      return failures;
     },
     [dataProvider, getCompanies, getTags, user?.identity?.id, today],
   );

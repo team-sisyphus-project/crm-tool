@@ -60,6 +60,17 @@ const createRecorder = () => {
   };
 };
 
+/** A backend that refuses to create the contact with the given first name. */
+const refusingCreate =
+  (refusedFirstName: string): DataProvider["create"] =>
+  async (_resource: string, params: CreateParams) => {
+    const { first_name: firstName } = params.data as { first_name?: string };
+    if (firstName === refusedFirstName) {
+      throw new Error(`${refusedFirstName} is not welcome`);
+    }
+    return { data: { ...params.data, id: 1 } } as never;
+  };
+
 const openWizard = async (ui: ReactElement = <ImportWizard />) => {
   const screen = await render(ui);
   await screen.getByRole("button", { name: "Import CSV" }).click();
@@ -460,5 +471,60 @@ describe("ContactImportDialog", () => {
     expect(
       recorder.created.contacts?.map(({ first_name }) => first_name),
     ).toEqual(["Grace"]);
+  });
+
+  it("reports the row the CRM refused, with a report to download", async () => {
+    // Arrange: the backend accepts Ada (line 2) but not Grace (line 3).
+    const screen = await openWizard(
+      <StoryWrapper dataProvider={{ create: refusingCreate("Grace") }}>
+        <ContactImportButton />
+      </StoryWrapper>,
+    );
+    await goToMappingStep(screen, csvFile());
+
+    // Act
+    await screen.getByRole("button", { name: "Start import" }).click();
+
+    // Assert
+    await expect
+      .element(
+        screen.getByText(
+          "Contacts import complete. Imported 1 contacts, with 1 errors",
+        ),
+      )
+      .toBeVisible();
+    await expect
+      .element(screen.getByText("Row 3: Grace is not welcome"))
+      .toBeVisible();
+    await expect
+      .element(
+        screen.getByRole("button", { name: "Download the rows that failed" }),
+      )
+      .toBeVisible();
+  });
+
+  it("offers no error report when every row went through", async () => {
+    const recorder = createRecorder();
+    const screen = await openWizard(
+      <StoryWrapper dataProvider={{ create: recorder.create }}>
+        <ContactImportButton />
+      </StoryWrapper>,
+    );
+    await goToMappingStep(screen, csvFile());
+
+    await screen.getByRole("button", { name: "Start import" }).click();
+
+    await expect
+      .element(
+        screen.getByText(
+          "Contacts import complete. Imported 2 contacts, with 0 errors",
+        ),
+      )
+      .toBeVisible();
+    await expect
+      .element(
+        screen.getByRole("button", { name: "Download the rows that failed" }),
+      )
+      .not.toBeInTheDocument();
   });
 });

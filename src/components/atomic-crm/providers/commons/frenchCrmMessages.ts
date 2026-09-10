@@ -146,6 +146,12 @@ export const frenchCrmMessages = {
         duplicates_update: "Les mettre à jour depuis ce fichier",
         duplicates_update_hint:
           "Les valeurs de votre fichier sont écrites sur le contact. Les e-mails, téléphones et étiquettes s'ajoutent à ceux qu'il a déjà ; rien n'est supprimé.",
+        failures_hint:
+          "Téléchargez les lignes qui ne sont pas passées, corrigez ce qu'indique la dernière colonne, puis importez ce fichier à nouveau.",
+        failure_row: "Ligne %{row} : %{reason}",
+        failures_more:
+          "et %{smart_count} ligne de plus |||| et %{smart_count} lignes de plus",
+        download_failures: "Télécharger les lignes en échec",
         outcomes:
           "%{created} créés, %{updated} mis à jour, %{skipped} ignorés car doublons.",
         fields: {

@@ -750,6 +750,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/import/errorReport.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/contacts/import/duration.ts",
           "type": "registry:component"
         },
@@ -783,6 +787,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/import/ImportMappingStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportFailureList.tsx",
           "type": "registry:component"
         },
         {

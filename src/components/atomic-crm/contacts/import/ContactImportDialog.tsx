@@ -105,7 +105,7 @@ export function ContactImportDialog({
             <ImportRunningStep
               rowCount={importer.rowCount}
               importCount={importer.importCount}
-              errorCount={importer.errorCount}
+              errorCount={wizard.failures.length}
               remainingTime={importer.remainingTime}
               onStop={wizard.stopImport}
             />
@@ -116,8 +116,9 @@ export function ContactImportDialog({
               <ImportSummaryStep
                 outcome="complete"
                 importCount={importer.importCount}
-                errorCount={importer.errorCount}
                 outcomes={wizard.outcomes}
+                failures={wizard.failures}
+                onDownloadFailures={wizard.downloadErrorReport}
               />
             ) : (
               <ImportSummaryStep outcome="error" />

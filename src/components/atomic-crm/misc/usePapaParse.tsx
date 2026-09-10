@@ -1,6 +1,12 @@
 import * as Papa from "papaparse";
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import type {
+  ImportRow,
+  ImportRowFailure,
+} from "../contacts/import/errorReport";
+import { toRowFailure } from "../contacts/import/errorReport";
+
 type Import =
   | {
       state: "idle";
@@ -13,7 +19,12 @@ type Import =
 
       rowCount: number;
       importCount: number;
-      errorCount: number;
+      /**
+       * Every row that did not make it, with its line and its reason. The
+       * error count is `failures.length`: one list, no counter to keep in step
+       * with it.
+       */
+      failures: ImportRowFailure[];
 
       // The remaining time in milliseconds
       remainingTime: number | null;
@@ -28,11 +39,38 @@ type usePapaParseProps<T> = {
   // The import batch size
   batchSize?: number;
 
-  // processBatch returns the number of imported items
-  processBatch(batch: T[]): Promise<void>;
+  /**
+   * Writes one batch and reports the rows it could not write. Returning the
+   * failures (rather than throwing on the first one) is what lets a batch land
+   * partially: the rows that worked are kept, the rest come back with a reason.
+   */
+  processBatch(batch: ImportRow<T>[]): Promise<ImportRowFailure[]>;
 };
 
-export function usePapaParse<T>({
+/**
+ * Turns the parser's own complaints into row failures.
+ *
+ * Only errors that point at a row are kept: those rows never reach the
+ * importer, because a line the parser could not read is a line the user has to
+ * fix. Errors about the file as a whole carry no row and are left to the
+ * `error` callback.
+ */
+function parseErrorFailures<T extends Record<string, unknown>>(
+  errors: Papa.ParseError[],
+  rows: ImportRow<T>[],
+): ImportRowFailure[] {
+  const byRow = new Map<number, ImportRowFailure>();
+  for (const error of errors) {
+    const row = typeof error.row === "number" ? rows[error.row] : undefined;
+    // The first complaint about a line is the one that explains it; the rest
+    // are usually consequences of the same malformed line.
+    if (!row || byRow.has(row.rowNumber)) continue;
+    byRow.set(row.rowNumber, toRowFailure(row, error.message));
+  }
+  return [...byRow.values()];
+}
+
+export function usePapaParse<T extends Record<string, unknown>>({
   batchSize = 10,
   processBatch,
 }: usePapaParseProps<T>) {
@@ -64,50 +102,66 @@ export function usePapaParse<T>({
             return;
           }
 
+          const rows: ImportRow<T>[] = results.data.map((values, index) => ({
+            // The header is line 1, so the first data row is line 2 and the
+            // number reads like the row gutter of a spreadsheet. Blank lines
+            // are already dropped by `skipEmptyLines`, so a padded file counts
+            // slightly low — close enough to find the row, and the report
+            // carries the values themselves anyway.
+            rowNumber: index + 2,
+            values,
+          }));
+          const parseFailures = parseErrorFailures(results.errors, rows);
+          const unreadable = new Set(
+            parseFailures.map((failure) => failure.rowNumber),
+          );
+          const pending = rows.filter((row) => !unreadable.has(row.rowNumber));
+
           setImporter({
             state: "running",
-            rowCount: results.data.length,
-            errorCount: results.errors.length,
+            rowCount: rows.length,
+            failures: parseFailures,
             importCount: 0,
             remainingTime: null,
           });
 
           let totalTime = 0;
-          for (let i = 0; i < results.data.length; i += batchSize) {
+          let processed = 0;
+          for (let i = 0; i < pending.length; i += batchSize) {
             if (importIdRef.current !== importId) {
               return;
             }
 
-            const batch = results.data.slice(i, i + batchSize);
+            const batch = pending.slice(i, i + batchSize);
+            const start = Date.now();
+            let batchFailures: ImportRowFailure[];
             try {
-              const start = Date.now();
-              await processBatch(batch);
-              totalTime += Date.now() - start;
-
-              const meanTime = totalTime / (i + batch.length);
-              setImporter((previous) => {
-                if (previous.state === "running") {
-                  const importCount = previous.importCount + batch.length;
-                  return {
-                    ...previous,
-                    importCount,
-                    remainingTime:
-                      meanTime * (results.data.length - importCount),
-                  };
-                }
-                return previous;
-              });
+              batchFailures = await processBatch(batch);
             } catch (error) {
+              // The batch died as a whole — a network drop, a provider that
+              // refused the call — so every row in it is a row the user still
+              // has to import, each with the same reason.
               console.error("Failed to import batch", error);
-              setImporter((previous) =>
-                previous.state === "running"
-                  ? {
-                      ...previous,
-                      errorCount: previous.errorCount + batch.length,
-                    }
-                  : previous,
-              );
+              batchFailures = batch.map((row) => toRowFailure(row, error));
             }
+            totalTime += Date.now() - start;
+            processed += batch.length;
+
+            const meanTime = totalTime / processed;
+            const remaining = pending.length - processed;
+            setImporter((previous) =>
+              previous.state === "running"
+                ? {
+                    ...previous,
+                    importCount:
+                      previous.importCount +
+                      batch.length -
+                      batchFailures.length,
+                    failures: [...previous.failures, ...batchFailures],
+                    remainingTime: meanTime * remaining,
+                  }
+                : previous,
+            );
           }
 
           setImporter((previous) =>

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { DataProvider } from "ra-core";
 
 import type { Company, Contact, Tag } from "../types";
-import type { DuplicatePolicy } from "./import/duplicates";
+import type { DuplicatePolicy, ImportOutcomes } from "./import/duplicates";
 import type { ContactImportSchema } from "./useContactImport";
 import { createImportRun, importContactBatch } from "./useContactImport";
 
@@ -49,7 +49,8 @@ const fakeDataProvider = (contacts: Contact[] = []) => {
   };
 };
 
-const importBatch = (
+/** The whole result of one batch: how its rows settled, and what failed. */
+const importBatchResult = (
   dataProvider: ReturnType<typeof fakeDataProvider>,
   batch: ContactImportSchema[],
   policy: DuplicatePolicy,
@@ -69,6 +70,12 @@ const importBatch = (
     salesId: 7,
     today: TODAY,
   });
+
+/** The outcome counters alone, for the cases that do not expect a failure. */
+const importBatch = (
+  ...args: Parameters<typeof importBatchResult>
+): Promise<ImportOutcomes> =>
+  importBatchResult(...args).then((result) => result.outcomes);
 
 describe("importContactBatch", () => {
   it("creates a contact the CRM does not have yet", async () => {
@@ -295,5 +302,108 @@ describe("importContactBatch", () => {
       company_id: 12,
       tags: [1, 2],
     });
+  });
+});
+
+describe("importContactBatch, when the CRM refuses a row", () => {
+  /** A provider that rejects the rows whose first name is in `refuse`. */
+  const refusingDataProvider = (refuse: string[], message = "Boom") => {
+    const dataProvider = fakeDataProvider([]);
+    const create = dataProvider.create;
+    dataProvider.create = vi.fn(
+      async (resource: string, params: { data: { first_name?: string } }) => {
+        if (refuse.includes(params.data.first_name ?? "")) {
+          throw new Error(message);
+        }
+        return create(resource, params);
+      },
+    ) as unknown as typeof dataProvider.create;
+    return dataProvider;
+  };
+
+  it("reports the refused row with its position and the reason", async () => {
+    // Arrange
+    const dataProvider = refusingDataProvider(["Sam"], "Email is invalid");
+
+    // Act
+    const { failures } = await importBatchResult(
+      dataProvider,
+      [
+        row({ first_name: "Ada", email_work: "ada@acme.example" }),
+        row({ first_name: "Sam", email_work: "sam@acme.example" }),
+      ],
+      "skip",
+    );
+
+    // Assert
+    expect(failures).toEqual([{ index: 1, reason: "Email is invalid" }]);
+  });
+
+  it("keeps writing the rest of the batch", async () => {
+    // Arrange
+    const dataProvider = refusingDataProvider(["Sam"]);
+
+    // Act
+    const { outcomes } = await importBatchResult(
+      dataProvider,
+      [
+        row({ first_name: "Sam", email_work: "sam@acme.example" }),
+        row({ first_name: "Ada", email_work: "ada@acme.example" }),
+      ],
+      "skip",
+    );
+
+    // Assert
+    expect(outcomes).toEqual({ created: 1, updated: 0, skipped: 0 });
+    expect(dataProvider.create).toHaveBeenCalledTimes(2);
+  });
+
+  it("lets a later row with the same email try again", async () => {
+    // Arrange: the first attempt fails, so the address stays unclaimed.
+    const dataProvider = refusingDataProvider(["Sam"]);
+    const run = createImportRun();
+    await importBatchResult(
+      dataProvider,
+      [row({ first_name: "Sam", email_work: "sam@acme.example" })],
+      "skip",
+      { run },
+    );
+
+    // Act
+    const { outcomes } = await importBatchResult(
+      dataProvider,
+      [row({ first_name: "Samuel", email_work: "sam@acme.example" })],
+      "skip",
+      { run },
+    );
+
+    // Assert
+    expect(outcomes).toEqual({ created: 1, updated: 0, skipped: 0 });
+  });
+
+  it("reports the row an update refused", async () => {
+    // Arrange
+    const dataProvider = fakeDataProvider([jane]);
+    dataProvider.update = vi.fn(async () => {
+      throw new Error("Contact is locked");
+    }) as unknown as typeof dataProvider.update;
+
+    // Act
+    const { outcomes, failures } = await importBatchResult(
+      dataProvider,
+      [
+        row({
+          first_name: "Jane",
+          last_name: "Roe",
+          email_work: "jane@acme.example",
+          title: "Lead analyst",
+        }),
+      ],
+      "update",
+    );
+
+    // Assert
+    expect(failures).toEqual([{ index: 0, reason: "Contact is locked" }]);
+    expect(outcomes).toEqual({ created: 0, updated: 0, skipped: 0 });
   });
 });

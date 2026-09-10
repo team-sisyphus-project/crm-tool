@@ -143,6 +143,12 @@ export const englishCrmMessages = {
         duplicates_update: "Update them from this file",
         duplicates_update_hint:
           "The values in your file are written onto the contact. Emails, phone numbers and tags are added to the ones they already have; nothing is removed.",
+        failures_hint:
+          "Download the rows that did not go through, fix what the last column explains, then import that file again.",
+        failure_row: "Row %{row}: %{reason}",
+        failures_more:
+          "and %{smart_count} more row |||| and %{smart_count} more rows",
+        download_failures: "Download the rows that failed",
         outcomes:
           "%{created} created, %{updated} updated, %{skipped} skipped as duplicates.",
         fields: {

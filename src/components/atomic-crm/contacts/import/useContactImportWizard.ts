@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { downloadCSV } from "ra-core";
+
 import type { CsvPreview } from "../../misc/usePapaParse";
 import { parseHeaders, usePapaParse } from "../../misc/usePapaParse";
 import type { ColumnMapping, CsvRow, ImportField } from "./columnMapping";
@@ -11,10 +13,15 @@ import {
 } from "./columnMapping";
 import type { DuplicatePolicy } from "./duplicates";
 import { DEFAULT_DUPLICATE_POLICY } from "./duplicates";
+import type { ImportRow, ImportRowFailure } from "./errorReport";
+import { buildErrorReportCsv, errorReportFileName } from "./errorReport";
 import { useContactImport } from "../useContactImport";
 
 /** Number of contacts sent to the data provider per round-trip. */
 export const IMPORT_BATCH_SIZE = 10;
+
+/** Stable empty list, so a wizard with no failures keeps a stable identity. */
+const NO_FAILURES: ImportRowFailure[] = [];
 
 /** Number of rows the preview step reads from the file. */
 export const PREVIEW_ROW_COUNT = 5;
@@ -78,15 +85,23 @@ export function useContactImportWizard() {
   const activePolicyRef = useRef<DuplicatePolicy>(DEFAULT_DUPLICATE_POLICY);
 
   const processMappedBatch = useCallback(
-    async (batch: CsvRow[]) => {
+    async (batch: ImportRow<CsvRow>[]): Promise<ImportRowFailure[]> => {
       const mapping = activeMappingRef.current;
       if (mapping === null) {
         throw new Error("The import started without a column mapping.");
       }
-      await processBatch(
-        batch.map((row) => applyMapping(row, mapping)),
+      const failures = await processBatch(
+        batch.map((row) => applyMapping(row.values, mapping)),
         activePolicyRef.current,
       );
+      // The importer answers in batch positions; the report needs the line the
+      // user has to fix and the values their file actually holds — not the
+      // mapped ones, so the report can be corrected and imported again as-is.
+      return failures.map(({ index, reason }) => ({
+        rowNumber: batch[index].rowNumber,
+        values: batch[index].values,
+        reason,
+      }));
     },
     [processBatch],
   );
@@ -198,6 +213,22 @@ export function useContactImportWizard() {
     setDuplicatePolicy(DEFAULT_DUPLICATE_POLICY);
   }, [reset]);
 
+  const failures =
+    importer.state === "running" || importer.state === "complete"
+      ? importer.failures
+      : NO_FAILURES;
+
+  const fileName = source.status === "empty" ? null : source.file.name;
+
+  /** Hands the failed rows back as a CSV the user can fix and import again. */
+  const downloadErrorReport = useCallback(() => {
+    if (failures.length === 0) return;
+    downloadCSV(
+      buildErrorReportCsv(failures),
+      errorReportFileName(fileName ?? "contacts"),
+    );
+  }, [failures, fileName]);
+
   const step = toStep(source, importer.state);
 
   return useMemo(
@@ -213,6 +244,8 @@ export function useContactImportWizard() {
       duplicatePolicy,
       setDuplicatePolicy,
       outcomes,
+      failures,
+      downloadErrorReport,
       isReadingFile: source.status === "reading",
       previewError: source.status === "invalid" ? source.error : null,
       selectFile,
@@ -233,6 +266,8 @@ export function useContactImportWizard() {
       canStartImport,
       duplicatePolicy,
       outcomes,
+      failures,
+      downloadErrorReport,
       selectFile,
       goToMapping,
       goToPreview,
