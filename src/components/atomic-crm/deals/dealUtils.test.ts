@@ -2,7 +2,14 @@ import { commands } from "vitest/browser";
 
 import { testI18nProvider } from "../providers/commons/i18nProvider";
 import type { DealStage } from "../types";
-import { buildStageChangeNoteText, formatISODateString } from "./dealUtils";
+import { frenchCrmMessages } from "../providers/commons/frenchCrmMessages";
+import {
+  DEAL_COUNT_KEY,
+  buildStageChangeNoteText,
+  formatDealAmount,
+  formatISODateString,
+  getColumnTotal,
+} from "./dealUtils";
 
 describe("formatISODateString", () => {
   let originalTimezone: string;
@@ -105,5 +112,71 @@ describe("buildStageChangeNoteText", () => {
 
     expect(backward).not.toBe(forward);
     expect(backward).toBe("Stage changed from Proposal Sent to Opportunity");
+  });
+});
+
+describe("getColumnTotal", () => {
+  it("sums the amounts of every deal in the column", () => {
+    // Arrange
+    const deals = [{ amount: 1000 }, { amount: 2500 }, { amount: 500 }];
+
+    // Act
+    const total = getColumnTotal(deals);
+
+    // Assert
+    expect(total).toBe(4000);
+  });
+
+  it("returns 0 for a stage with no deals", () => {
+    expect(getColumnTotal([])).toBe(0);
+  });
+
+  it("counts a deal with a missing amount as 0 instead of NaN", () => {
+    // Arrange: an imported deal can reach the board without an amount
+    const deals = [{ amount: 1000 }, { amount: null as unknown as number }];
+
+    // Act
+    const total = getColumnTotal(deals);
+
+    // Assert
+    expect(total).toBe(1000);
+  });
+});
+
+describe("formatDealAmount", () => {
+  it("formats a total as a compact currency amount", () => {
+    expect(formatDealAmount(4000, "USD")).toBe("$4.00K");
+  });
+
+  it("formats an empty column total as a currency amount, not a bare zero", () => {
+    expect(formatDealAmount(0, "USD")).toBe("$0.00");
+  });
+
+  it("uses the configured currency", () => {
+    expect(formatDealAmount(4000, "EUR")).toContain("€");
+  });
+});
+
+describe("deal count label", () => {
+  it("renders the singular form for one deal", () => {
+    expect(testI18nProvider.translate(DEAL_COUNT_KEY, { smart_count: 1 })).toBe(
+      "1 deal",
+    );
+  });
+
+  it("renders the plural form for an empty column", () => {
+    expect(testI18nProvider.translate(DEAL_COUNT_KEY, { smart_count: 0 })).toBe(
+      "0 deals",
+    );
+  });
+
+  it("renders the plural form for several deals", () => {
+    expect(testI18nProvider.translate(DEAL_COUNT_KEY, { smart_count: 3 })).toBe(
+      "3 deals",
+    );
+  });
+
+  it("is translated in the French catalog too", () => {
+    expect(frenchCrmMessages.resources.deals.nb_deals).toContain("||||");
   });
 });

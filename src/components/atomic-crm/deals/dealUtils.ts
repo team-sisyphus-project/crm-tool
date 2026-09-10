@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import type { DealStage } from "../types";
+import type { Deal, DealStage } from "../types";
 
 export const findDealLabel = (dealStages: DealStage[], dealValue: string) => {
   const dealStage = dealStages.find((stage) => stage.value === dealValue);
@@ -77,4 +77,35 @@ export function buildStageChangeNoteText(
     from: findDealLabel(dealStages, fromStage) ?? fromStage,
     to: findDealLabel(dealStages, toStage) ?? toStage,
   });
+}
+
+/**
+ * Intl options every deal amount is rendered with, so a card, a column total
+ * and any future amount readout stay visually consistent.
+ */
+export const DEAL_AMOUNT_FORMAT: Intl.NumberFormatOptions = {
+  notation: "compact",
+  style: "currency",
+  currencyDisplay: "narrowSymbol",
+  minimumSignificantDigits: 3,
+};
+
+/**
+ * Translation key for the "N deals" count shown next to a column total.
+ * Exported so the message catalogs and the tests share a single source.
+ */
+export const DEAL_COUNT_KEY = "resources.deals.nb_deals";
+
+/**
+ * Sum the amounts of the deals sitting in one stage column. A deal with a
+ * missing amount counts as 0 so one incomplete record cannot turn the whole
+ * column header into "NaN".
+ */
+export function getColumnTotal(deals: Pick<Deal, "amount">[]): number {
+  return deals.reduce((sum, deal) => sum + (Number(deal.amount) || 0), 0);
+}
+
+/** Format a deal amount as a compact currency string. */
+export function formatDealAmount(amount: number, currency: string): string {
+  return amount.toLocaleString("en-US", { ...DEAL_AMOUNT_FORMAT, currency });
 }

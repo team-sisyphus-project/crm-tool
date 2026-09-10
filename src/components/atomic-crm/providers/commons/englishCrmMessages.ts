@@ -192,6 +192,7 @@ export const englishCrmMessages = {
     },
     deals: {
       name: "Deal |||| Deals",
+      nb_deals: "%{smart_count} deal |||| %{smart_count} deals",
       fields: {
         name: "Name",
         description: "Description",
