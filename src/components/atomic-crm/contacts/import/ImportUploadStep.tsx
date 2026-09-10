@@ -31,7 +31,7 @@ export function ImportUploadStep({
   return (
     <div className="flex flex-col gap-4">
       <Alert>
-        <AlertDescription className="flex flex-col gap-4">
+        <AlertDescription className="flex flex-col gap-2">
           {translate("resources.contacts.import.sample_hint")}
           <Button asChild variant="outline" size="sm">
             <Link to={SAMPLE_URL} download={SAMPLE_FILE_NAME}>

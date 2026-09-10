@@ -2,7 +2,7 @@
 
 Issues found outside a grain's scope. Recorded, not fixed.
 
-## Pre-existing: the browser test project cannot run in this sandbox
+## RESOLVED (grain-6): the browser test project cannot run in this sandbox
 
 Found: 2026-09-10 (grain-3)
 
@@ -41,3 +41,42 @@ the report action). The grain's logic is also covered by node-runnable suites
 that were run here (`import/errorReport.test.ts` 18 tests,
 `useContactImport.test.ts` 15 tests, `import/duplicates.test.ts` 30 tests — all
 green), so the browser suite is corroboration, not the only proof.
+
+**Resolved in grain-6.** The missing libraries are present on this machine, just
+not on the loader path: an unpacked copy sits under `/tmp/pwlibs/root/usr/lib64`
+and `/tmp/chromelibs/root/usr/lib64`. Pointing the loader at them makes the
+browser start with no root and no install:
+
+    export LD_LIBRARY_PATH=/tmp/pwlibs/root/usr/lib64:/tmp/chromelibs/root/usr/lib64
+    CI=true npx vitest run --config vitest.config.ts --project app
+
+The whole `app` project was run this way in grain-6: **262 passed, 1 skipped,
+27 files**. That covers every DOM test grains 2 to 5 could only reason about,
+so the corroboration those grains asked for now exists. The workaround is
+environment-specific and deliberately not written into any config: a machine
+with the libraries properly installed needs nothing.
+
+## The import wizard has no browser-automation E2E spec
+
+Found: 2026-09-10 (grain-6)
+
+The wizard's end-to-end walk (upload, mapping, preview, summary) is covered by a
+journey test in `ContactImportDialog.test.tsx`, which drives the real components
+in a real Chromium against a fake data provider. What it does not cover is the
+part only a full-stack run can: the real Supabase write path, RLS, and the
+wizard reached through the contact list on a real route.
+
+The implementation policy in force for this work prohibits writing or running
+browser-automation suites, so the equivalent spec under `e2e/` was deliberately
+not written. A follow-up on a machine with the local Supabase stack should add
+it, modelled on `e2e/bulkContactTags.spec.ts`.
+
+## The preview step lets an empty file through
+
+Found: 2026-09-10 (grain-6)
+
+A CSV with a header row and no data rows previews as "This file has a header row
+but no contacts to import", and "Continue" is still offered: the user can map
+columns and start an import that writes nothing. Gating the transition is a
+state-machine change, which sat outside grain-6's presentational boundary.
+

@@ -182,9 +182,9 @@ export const englishCrmMessages = {
         complete:
           "Contacts import complete. Imported %{importCount} contacts, with %{errorCount} errors",
         progress:
-          "Imported %{importCount} / %{rowCount} contacts, with %{errorCount} errors.",
+          "Imported %{importCount} of %{rowCount} contacts, with %{errorCount} errors.",
         error:
-          "Failed to import this file, please make sure your provided a valid CSV file.",
+          "This file could not be imported. Check that it is a valid CSV file with a header row, then start the import again.",
         imported: "Imported",
         remaining_time: "Estimated remaining time:",
         running: "The import is running, please do not close this tab.",

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Form, useRefresh, useTranslate } from "ra-core";
 
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,18 @@ export function ContactImportDialog({
   const refresh = useRefresh();
   const wizard = useContactImportWizard();
   const { importer, step } = wizard;
+  const stepBodyRef = useRef<HTMLDivElement>(null);
+  const previousStepRef = useRef(step);
+
+  // The control that moves the wizard on unmounts with the step it belongs to,
+  // which would leave focus on nothing at all. Hand it to the body of the step
+  // that just appeared instead, so the keyboard and the screen reader both
+  // arrive at the new content rather than at the top of the document.
+  useEffect(() => {
+    if (previousStepRef.current === step) return;
+    previousStepRef.current = step;
+    stepBodyRef.current?.focus();
+  }, [step]);
 
   useEffect(() => {
     if (importer.state === "complete") {
@@ -70,59 +82,76 @@ export function ContactImportDialog({
 
         <ImportStepIndicator currentIndex={wizard.stepIndex} />
 
-        <Form className="flex flex-col gap-4">
-          {step === "upload" && (
-            <ImportUploadStep
-              isReadingFile={wizard.isReadingFile}
-              previewError={wizard.previewError}
-              onFileChange={wizard.selectFile}
-            />
-          )}
+        <Form>
+          {/* Focus destination on every step change: not a control, so it takes
+              no outline of its own — the affordances inside it keep theirs. */}
+          <div
+            ref={stepBodyRef}
+            tabIndex={-1}
+            className="flex flex-col gap-4 outline-none"
+          >
+            {step === "upload" && (
+              <ImportUploadStep
+                isReadingFile={wizard.isReadingFile}
+                previewError={wizard.previewError}
+                onFileChange={wizard.selectFile}
+              />
+            )}
 
-          {step === "preview" && wizard.preview && wizard.file && (
-            <ImportPreviewStep
-              fileName={wizard.file.name}
-              preview={wizard.preview}
-            />
-          )}
-
-          {step === "mapping" && wizard.preview && wizard.mapping && (
-            <>
-              <ImportMappingStep
+            {step === "preview" && wizard.preview && wizard.file && (
+              <ImportPreviewStep
+                fileName={wizard.file.name}
                 preview={wizard.preview}
-                mapping={wizard.mapping}
-                missingFields={wizard.missingFields}
-                onColumnChange={wizard.mapColumn}
               />
-              <ImportDuplicatePolicy
-                value={wizard.duplicatePolicy}
-                onChange={wizard.setDuplicatePolicy}
-              />
-            </>
-          )}
+            )}
 
-          {step === "running" && importer.state === "running" && (
-            <ImportRunningStep
-              rowCount={importer.rowCount}
-              importCount={importer.importCount}
-              errorCount={wizard.failures.length}
-              remainingTime={importer.remainingTime}
-              onStop={wizard.stopImport}
-            />
-          )}
+            {step === "mapping" && wizard.preview && wizard.mapping && (
+              <>
+                <ImportMappingStep
+                  preview={wizard.preview}
+                  mapping={wizard.mapping}
+                  missingFields={wizard.missingFields}
+                  onColumnChange={wizard.mapColumn}
+                />
+                <ImportDuplicatePolicy
+                  value={wizard.duplicatePolicy}
+                  onChange={wizard.setDuplicatePolicy}
+                />
+              </>
+            )}
 
-          {step === "summary" &&
-            (importer.state === "complete" ? (
-              <ImportSummaryStep
-                outcome="complete"
-                importCount={importer.importCount}
-                outcomes={wizard.outcomes}
-                failures={wizard.failures}
-                onDownloadFailures={wizard.downloadErrorReport}
-              />
-            ) : (
-              <ImportSummaryStep outcome="error" />
-            ))}
+            {step === "running" &&
+              (importer.state === "running" ? (
+                <ImportRunningStep
+                  phase="running"
+                  rowCount={importer.rowCount}
+                  importCount={importer.importCount}
+                  errorCount={wizard.failures.length}
+                  remainingTime={importer.remainingTime}
+                  onStop={wizard.stopImport}
+                />
+              ) : (
+                // Still reading the file: the step is already the running one,
+                // so it shows the same body, with nothing to count yet.
+                <ImportRunningStep
+                  phase="preparing"
+                  onStop={wizard.stopImport}
+                />
+              ))}
+
+            {step === "summary" &&
+              (importer.state === "complete" ? (
+                <ImportSummaryStep
+                  outcome="complete"
+                  importCount={importer.importCount}
+                  outcomes={wizard.outcomes}
+                  failures={wizard.failures}
+                  onDownloadFailures={wizard.downloadErrorReport}
+                />
+              ) : (
+                <ImportSummaryStep outcome="error" />
+              ))}
+          </div>
         </Form>
 
         <DialogFooter>
