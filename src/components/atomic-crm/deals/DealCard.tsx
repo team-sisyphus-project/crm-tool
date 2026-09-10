@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
+import { DEAL_AMOUNT_FORMAT } from "./dealUtils";
 
 export const DealCard = ({ deal, index }: { deal: Deal; index: number }) => {
   if (!deal) return null;
@@ -76,13 +77,7 @@ export const DealCardContent = ({
             <p className="text-xs text-muted-foreground">
               <NumberField
                 source="amount"
-                options={{
-                  notation: "compact",
-                  style: "currency",
-                  currency,
-                  currencyDisplay: "narrowSymbol",
-                  minimumSignificantDigits: 3,
-                }}
+                options={{ ...DEAL_AMOUNT_FORMAT, currency }}
               />
               {deal.category && ", "}
               <SelectField
