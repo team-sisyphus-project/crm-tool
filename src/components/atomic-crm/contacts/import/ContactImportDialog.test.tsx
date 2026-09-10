@@ -459,6 +459,34 @@ describe("ContactImportDialog", () => {
     expect(recorder.updated.contacts).toBeUndefined();
   });
 
+  it("counts only the contacts it wrote, agreeing with the outcome line", async () => {
+    // Arrange: two rows, one of which is Ada — already in the CRM. Under the
+    // default policy she is left alone, so exactly one contact gets written.
+    const screen = await openWizard(
+      <StoryWrapper data={knownContact()}>
+        <ContactImportButton />
+      </StoryWrapper>,
+    );
+    await goToMappingStep(screen, csvFile());
+
+    // Act
+    await screen.getByRole("button", { name: "Start import" }).click();
+
+    // Assert: the headline reports the write, not the walk through the wizard.
+    await expect
+      .element(
+        screen.getByText(
+          "Contacts import complete. Imported 1 contacts, with 0 errors",
+        ),
+      )
+      .toBeVisible();
+    await expect
+      .element(
+        screen.getByText("1 created, 0 updated, 1 skipped as duplicates."),
+      )
+      .toBeVisible();
+  });
+
   it("updates the contact already in the CRM when asked to", async () => {
     const recorder = createRecorder();
     const screen = await openWizard(

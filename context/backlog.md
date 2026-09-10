@@ -71,6 +71,15 @@ browser-automation suites, so the equivalent spec under `e2e/` was deliberately
 not written. A follow-up on a machine with the local Supabase stack should add
 it, modelled on `e2e/bulkContactTags.spec.ts`.
 
+Updated 2026-09-10 (fix-1): review called this blocking, so the prohibition is
+now cited exactly and the environment claim verified — see
+`context/decisions/2026-09-10-grain-6-wizard-journey-test.md`
+(`.charlie/principal/skills/implement/SKILL.md:64`,
+`.charlie/agents/implementer.md:48`; `docker` absent, so no local Supabase).
+**Awaiting a human decision**: waive the E2E deliverable for this job, or lift
+the prohibition and schedule the spec where the stack runs. Not an implementer's
+call either way.
+
 ## The preview step lets an empty file through
 
 Found: 2026-09-10 (grain-6)

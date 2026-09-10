@@ -10,6 +10,8 @@ import { ImportFailureList } from "./ImportFailureList";
 type ImportSummaryStepProps =
   | {
       outcome: "complete";
+      /** Rows the CRM wrote: `outcomes.created + outcomes.updated`, never the
+       *  number of rows read — a skipped duplicate was read and not written. */
       importCount: number;
       /** How the rows were settled: created, updated, or skipped as duplicates. */
       outcomes: ImportOutcomes;

@@ -16,6 +16,8 @@ type ImportRunningStepProps = {
   | {
       phase: "running";
       rowCount: number;
+      /** Rows written so far, not rows processed: a skipped duplicate is
+       *  neither an import nor an error, and is counted as neither. */
       importCount: number;
       errorCount: number;
       /** Estimated milliseconds left, or null while it is still unknown. */

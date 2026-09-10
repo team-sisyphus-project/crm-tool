@@ -17,8 +17,12 @@ type Import =
   | {
       state: "running" | "complete";
 
+      /**
+       * How many rows the file holds. The parser counts rows, not writes: what
+       * each row settled into is the caller's to report, because only the
+       * caller knows whether a row was created, updated or left alone.
+       */
       rowCount: number;
-      importCount: number;
       /**
        * Every row that did not make it, with its line and its reason. The
        * error count is `failures.length`: one list, no counter to keep in step
@@ -121,7 +125,6 @@ export function usePapaParse<T extends Record<string, unknown>>({
             state: "running",
             rowCount: rows.length,
             failures: parseFailures,
-            importCount: 0,
             remainingTime: null,
           });
 
@@ -153,10 +156,6 @@ export function usePapaParse<T extends Record<string, unknown>>({
               previous.state === "running"
                 ? {
                     ...previous,
-                    importCount:
-                      previous.importCount +
-                      batch.length -
-                      batchFailures.length,
                     failures: [...previous.failures, ...batchFailures],
                     remainingTime: meanTime * remaining,
                   }

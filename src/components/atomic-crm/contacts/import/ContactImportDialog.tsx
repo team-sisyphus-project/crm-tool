@@ -37,6 +37,10 @@ export function ContactImportDialog({
   const refresh = useRefresh();
   const wizard = useContactImportWizard();
   const { importer, step } = wizard;
+  // "Imported N contacts" must count the rows the CRM actually wrote. A row
+  // skipped as a duplicate went through the wizard without being written, so
+  // counting it here would contradict the outcome line right underneath.
+  const writtenCount = wizard.outcomes.created + wizard.outcomes.updated;
   const stepBodyRef = useRef<HTMLDivElement>(null);
   const previousStepRef = useRef(step);
 
@@ -125,7 +129,7 @@ export function ContactImportDialog({
                 <ImportRunningStep
                   phase="running"
                   rowCount={importer.rowCount}
-                  importCount={importer.importCount}
+                  importCount={writtenCount}
                   errorCount={wizard.failures.length}
                   remainingTime={importer.remainingTime}
                   onStop={wizard.stopImport}
@@ -143,7 +147,7 @@ export function ContactImportDialog({
               (importer.state === "complete" ? (
                 <ImportSummaryStep
                   outcome="complete"
-                  importCount={importer.importCount}
+                  importCount={writtenCount}
                   outcomes={wizard.outcomes}
                   failures={wizard.failures}
                   onDownloadFailures={wizard.downloadErrorReport}
