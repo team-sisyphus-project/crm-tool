@@ -12,6 +12,7 @@ import { failureReason } from "./import/errorReport";
 import {
   addOutcomes,
   buildContactPatch,
+  contactEmails,
   decideBatch,
   emailEntries,
   isEmptyPatch,
@@ -233,6 +234,16 @@ export async function importContactBatch({
     if (results[index].outcome === "failed") return;
     for (const email of decision.emails) {
       run.claimed.add(email);
+    }
+    // A contact this row was matched to is spoken for by every address it
+    // holds, not only the one the row reached it through. `decideBatch` already
+    // settles that inside a batch; claiming them here extends it to the rest of
+    // the run, so a later batch finding the same person by another of their
+    // addresses cannot write a second time over what this row just did.
+    if (decision.action === "update") {
+      for (const email of contactEmails(decision.contact)) {
+        run.claimed.add(email);
+      }
     }
   });
 

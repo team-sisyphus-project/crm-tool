@@ -226,6 +226,38 @@ describe("importContactBatch", () => {
     expect(dataProvider.create).toHaveBeenCalledTimes(1);
   });
 
+  it("updates a matched contact once when a later batch reaches it by another of its addresses", async () => {
+    const janeBothAddresses = {
+      ...jane,
+      email_jsonb: [
+        { email: "jane@acme.example", type: "Work" },
+        { email: "jane@home.example", type: "Home" },
+      ],
+    } as unknown as Contact;
+    const dataProvider = fakeDataProvider([janeBothAddresses]);
+    const run = createImportRun();
+
+    const first = await importBatch(
+      dataProvider,
+      [row({ email_work: "jane@acme.example", title: "Head of Analytics" })],
+      "update",
+      { run },
+    );
+    const second = await importBatch(
+      dataProvider,
+      [row({ email_home: "jane@home.example", title: "Analyst" })],
+      "update",
+      { run },
+    );
+
+    expect(first).toEqual({ created: 0, updated: 1, skipped: 0 });
+    expect(second).toEqual({ created: 0, updated: 0, skipped: 1 });
+    expect(dataProvider.update).toHaveBeenCalledTimes(1);
+    expect(dataProvider.update.mock.calls[0][1].data).toMatchObject({
+      title: "Head of Analytics",
+    });
+  });
+
   it("creates every row that carries no email, duplicate or not", async () => {
     const dataProvider = fakeDataProvider([]);
 

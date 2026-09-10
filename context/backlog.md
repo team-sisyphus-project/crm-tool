@@ -89,3 +89,19 @@ but no contacts to import", and "Continue" is still offered: the user can map
 columns and start an import that writes nothing. Gating the transition is a
 state-machine change, which sat outside grain-6's presentational boundary.
 
+
+## Stopping a running import leaves the user with no summary
+
+Found: 2026-09-10 (grain-1, batch create/update with summary)
+
+`stopImport` calls the parser's `reset()`, which puts the importer back to
+`idle`. The wizard's derived step then falls back to `mapping`, so the counters
+for the rows that were already written (`outcomes`) disappear from the screen
+without ever being shown as a summary.
+
+A user who stops a 10,000-row import after 4,000 rows is told nothing about what
+the CRM already wrote, and re-running the file is their only way to find out.
+
+Out of scope here: the fix is a new terminal state ("stopped") in
+`useContactImportWizard`'s `toStep`, plus a summary variant that says the run was
+interrupted. That is wizard-flow work, not batch create/update work.
