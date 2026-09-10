@@ -754,6 +754,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/import/columnMapping.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/contacts/import/ImportUploadStep.tsx",
           "type": "registry:component"
         },
@@ -771,6 +775,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/import/ImportPreviewStep.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/import/ImportMappingStep.tsx",
           "type": "registry:component"
         },
         {

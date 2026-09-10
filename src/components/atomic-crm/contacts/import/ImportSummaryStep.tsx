@@ -6,7 +6,7 @@ type ImportSummaryStepProps =
   | { outcome: "complete"; importCount: number; errorCount: number }
   | { outcome: "error" };
 
-/** Step 3, finished: what happened, in one sentence. */
+/** Step 4, finished: what happened, in one sentence. */
 export function ImportSummaryStep(props: ImportSummaryStepProps) {
   const translate = useTranslate();
 

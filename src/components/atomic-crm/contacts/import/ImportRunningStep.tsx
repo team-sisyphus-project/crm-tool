@@ -15,7 +15,7 @@ type ImportRunningStepProps = {
   onStop(): void;
 };
 
-/** Step 3, in progress: live counters plus a way out. */
+/** Step 4, in progress: live counters plus a way out. */
 export function ImportRunningStep({
   rowCount,
   importCount,

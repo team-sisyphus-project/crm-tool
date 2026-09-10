@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { ImportMappingStep } from "./ImportMappingStep";
 import { ImportPreviewStep } from "./ImportPreviewStep";
 import { ImportRunningStep } from "./ImportRunningStep";
 import { ImportStepIndicator } from "./ImportStepIndicator";
@@ -84,6 +85,15 @@ export function ContactImportDialog({
             />
           )}
 
+          {step === "mapping" && wizard.preview && wizard.mapping && (
+            <ImportMappingStep
+              preview={wizard.preview}
+              mapping={wizard.mapping}
+              missingFields={wizard.missingFields}
+              onColumnChange={wizard.mapColumn}
+            />
+          )}
+
           {step === "running" && importer.state === "running" && (
             <ImportRunningStep
               rowCount={importer.rowCount}
@@ -107,7 +117,7 @@ export function ContactImportDialog({
         </Form>
 
         <DialogFooter>
-          {step === "preview" ? (
+          {step === "preview" && (
             <>
               <Button
                 type="button"
@@ -116,11 +126,32 @@ export function ContactImportDialog({
               >
                 {translate("resources.contacts.import.back")}
               </Button>
-              <Button type="button" onClick={wizard.startImport}>
+              <Button type="button" onClick={wizard.goToMapping}>
+                {translate("resources.contacts.import.next")}
+              </Button>
+            </>
+          )}
+
+          {step === "mapping" && (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={wizard.goToPreview}
+              >
+                {translate("resources.contacts.import.back")}
+              </Button>
+              <Button
+                type="button"
+                onClick={wizard.startImport}
+                disabled={!wizard.canStartImport}
+              >
                 {translate("resources.contacts.import.start")}
               </Button>
             </>
-          ) : (
+          )}
+
+          {step !== "preview" && step !== "mapping" && (
             <Button
               type="button"
               variant="outline"
