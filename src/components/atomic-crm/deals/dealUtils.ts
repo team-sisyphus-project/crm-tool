@@ -50,3 +50,31 @@ export function formatISODateString(dateString: string) {
 
   return format(date, "PP");
 }
+
+/**
+ * Translation key for the note logged when a deal moves to another stage.
+ * Exported so the message catalogs and the tests share a single source.
+ */
+export const STAGE_CHANGE_NOTE_KEY = "resources.deals.stage_change_note";
+
+type TranslateStageChange = (
+  key: string,
+  options: { from: string; to: string },
+) => string;
+
+/**
+ * Build the text of the note logged when a deal is dragged to another stage.
+ * Falls back to the raw stage value when a stage is missing from the
+ * configuration, so the sentence never reads "from undefined".
+ */
+export function buildStageChangeNoteText(
+  dealStages: DealStage[],
+  fromStage: string,
+  toStage: string,
+  translate: TranslateStageChange,
+): string {
+  return translate(STAGE_CHANGE_NOTE_KEY, {
+    from: findDealLabel(dealStages, fromStage) ?? fromStage,
+    to: findDealLabel(dealStages, toStage) ?? toStage,
+  });
+}

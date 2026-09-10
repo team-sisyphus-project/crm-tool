@@ -232,6 +232,9 @@ export const englishCrmMessages = {
         description: "It seems your deal list is empty.",
         title: "No deals found",
       },
+      stage_change_note: "Stage changed from %{from} to %{to}",
+      stage_change_note_error:
+        "The deal moved, but the stage change could not be logged",
       invalid_date: "Invalid date",
     },
     notes: {

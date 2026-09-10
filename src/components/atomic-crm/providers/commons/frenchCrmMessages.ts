@@ -237,6 +237,9 @@ export const frenchCrmMessages = {
         description: "Il semble que votre liste d'affaires soit vide.",
         title: "Aucune affaire trouvée",
       },
+      stage_change_note: "Étape changée de %{from} à %{to}",
+      stage_change_note_error:
+        "L'affaire a été déplacée, mais le changement d'étape n'a pas pu être enregistré",
       invalid_date: "Date invalide",
     },
     notes: {

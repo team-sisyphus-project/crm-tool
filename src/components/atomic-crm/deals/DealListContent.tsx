@@ -1,11 +1,20 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import isEqual from "lodash/isEqual";
-import { useDataProvider, useListContext, type DataProvider } from "ra-core";
+import {
+  useDataProvider,
+  useGetIdentity,
+  useListContext,
+  useNotify,
+  useTranslate,
+  type DataProvider,
+  type Identifier,
+} from "ra-core";
 import { useEffect, useState } from "react";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import type { Deal } from "../types";
+import type { Deal, DealStage } from "../types";
 import { DealColumn } from "./DealColumn";
+import { buildStageChangeNoteText } from "./dealUtils";
 import type { DealsByStage } from "./stages";
 import { getDealsByStage } from "./stages";
 
@@ -13,6 +22,9 @@ export const DealListContent = () => {
   const { dealStages } = useConfigurationContext();
   const { data: unorderedDeals, isPending, refetch } = useListContext<Deal>();
   const dataProvider = useDataProvider();
+  const { identity } = useGetIdentity();
+  const notify = useNotify();
+  const translate = useTranslate();
 
   const [dealsByStage, setDealsByStage] = useState<DealsByStage>(
     getDealsByStage([], dealStages),
@@ -65,9 +77,32 @@ export const DealListContent = () => {
     );
 
     // persist the changes
-    updateDealStage(sourceDeal, destinationDeal, dataProvider).then(() => {
-      refetch();
-    });
+    updateDealStage(sourceDeal, destinationDeal, dataProvider)
+      .then(async () => {
+        if (sourceStage === destinationStage) return;
+        // The stage move is already persisted: a failing note must not undo it,
+        // so the failure is reported and the board still refreshes.
+        try {
+          await logStageChange(
+            {
+              deal: sourceDeal,
+              fromStage: sourceStage,
+              toStage: destinationStage,
+              salesId: identity?.id,
+              dealStages,
+              translate,
+            },
+            dataProvider,
+          );
+        } catch {
+          notify("resources.deals.stage_change_note_error", {
+            type: "warning",
+          });
+        }
+      })
+      .then(() => {
+        refetch();
+      });
   };
 
   return (
@@ -83,6 +118,41 @@ export const DealListContent = () => {
       </div>
     </DragDropContext>
   );
+};
+
+/**
+ * Log a "Stage changed from X to Y" note on the deal timeline. One drag across
+ * columns produces exactly one note, since onDragEnd fires once per drop.
+ */
+const logStageChange = async (
+  {
+    deal,
+    fromStage,
+    toStage,
+    salesId,
+    dealStages,
+    translate,
+  }: {
+    deal: Deal;
+    fromStage: string;
+    toStage: string;
+    salesId: Identifier | undefined;
+    dealStages: DealStage[];
+    translate: (key: string, options: { from: string; to: string }) => string;
+  },
+  dataProvider: DataProvider,
+) => {
+  if (salesId == null) {
+    throw new Error("Cannot log a stage change without an identity");
+  }
+  await dataProvider.create("deal_notes", {
+    data: {
+      deal_id: deal.id,
+      text: buildStageChangeNoteText(dealStages, fromStage, toStage, translate),
+      date: new Date().toISOString(),
+      sales_id: salesId,
+    },
+  });
 };
 
 const updateDealStageLocal = (

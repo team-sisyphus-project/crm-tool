@@ -1,6 +1,8 @@
 import { commands } from "vitest/browser";
 
-import { formatISODateString } from "./dealUtils";
+import { testI18nProvider } from "../providers/commons/i18nProvider";
+import type { DealStage } from "../types";
+import { buildStageChangeNoteText, formatISODateString } from "./dealUtils";
 
 describe("formatISODateString", () => {
   let originalTimezone: string;
@@ -50,5 +52,58 @@ describe("formatISODateString", () => {
     expect(() => formatISODateString(invalidDate)).toThrow(
       "Invalid date format. Expected YYYY-MM-DD.",
     );
+  });
+});
+
+describe("buildStageChangeNoteText", () => {
+  const dealStages: DealStage[] = [
+    { value: "opportunity", label: "Opportunity" },
+    { value: "proposal-sent", label: "Proposal Sent" },
+  ];
+
+  // The real message catalog, so the assertions cover the sentence a user reads.
+  const translate = (key: string, options: { from: string; to: string }) =>
+    testI18nProvider.translate(key, options);
+
+  it("names both stage labels in the logged sentence", () => {
+    // Arrange / Act
+    const text = buildStageChangeNoteText(
+      dealStages,
+      "opportunity",
+      "proposal-sent",
+      translate,
+    );
+
+    // Assert
+    expect(text).toBe("Stage changed from Opportunity to Proposal Sent");
+  });
+
+  it("falls back to the raw stage value when a stage is not configured", () => {
+    const text = buildStageChangeNoteText(
+      dealStages,
+      "opportunity",
+      "delivered",
+      translate,
+    );
+
+    expect(text).toBe("Stage changed from Opportunity to delivered");
+  });
+
+  it("keeps the source and destination stages in order", () => {
+    const forward = buildStageChangeNoteText(
+      dealStages,
+      "opportunity",
+      "proposal-sent",
+      translate,
+    );
+    const backward = buildStageChangeNoteText(
+      dealStages,
+      "proposal-sent",
+      "opportunity",
+      translate,
+    );
+
+    expect(backward).not.toBe(forward);
+    expect(backward).toBe("Stage changed from Proposal Sent to Opportunity");
   });
 });
