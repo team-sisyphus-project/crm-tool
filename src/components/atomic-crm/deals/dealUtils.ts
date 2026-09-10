@@ -80,8 +80,10 @@ export function buildStageChangeNoteText(
 }
 
 /**
- * Intl options every deal amount is rendered with, so a card, a column total
- * and any future amount readout stay visually consistent.
+ * Materializes the `number-format` design token group: compact notation,
+ * narrow currency symbol and the significant-digit floor. Every deal amount is
+ * rendered with these options, so a card, a column total and any future amount
+ * readout stay visually consistent.
  */
 export const DEAL_AMOUNT_FORMAT: Intl.NumberFormatOptions = {
   notation: "compact",
