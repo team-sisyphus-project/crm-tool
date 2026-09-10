@@ -193,6 +193,50 @@ async function createContact({
   return data;
 }
 
+async function createDeal({
+  name,
+  stage,
+  companyId,
+  salesId,
+  amount = 1000,
+  index = 0,
+  category = "other",
+  // DealShow throws on a null expected_closing_date, so every seeded deal gets one.
+  expectedClosingDate = "2099-12-31",
+}: {
+  name: string;
+  stage: string;
+  companyId: string | number;
+  salesId: string | number;
+  amount?: number;
+  index?: number;
+  category?: string;
+  expectedClosingDate?: string;
+}) {
+  const { data, error } = await adminSupabase
+    .from("deals")
+    .insert({
+      name,
+      stage,
+      company_id: companyId,
+      sales_id: salesId,
+      amount,
+      index,
+      category,
+      description: "",
+      contact_ids: [],
+      expected_closing_date: expectedClosingDate,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to create deal: ${error.message}`);
+  }
+
+  return data;
+}
+
 const getMenuMethod = ({ page }: { page: Page; isMobile: boolean }) => ({
   goToDashboard: async () => {
     await page.getByRole("link", { name: "Dashboard" }).click();
@@ -200,6 +244,10 @@ const getMenuMethod = ({ page }: { page: Page; isMobile: boolean }) => ({
   },
   goToContacts: async () => {
     await page.getByRole("link", { name: "Contacts" }).click();
+    await page.waitForLoadState("networkidle");
+  },
+  goToDeals: async () => {
+    await page.getByRole("link", { name: "Deals" }).click();
     await page.waitForLoadState("networkidle");
   },
 });
@@ -217,6 +265,7 @@ export const test = base.extend<{
   createSales: typeof createSales;
   createCompany: typeof createCompany;
   createContact: typeof createContact;
+  createDeal: typeof createDeal;
   createNotes: typeof createNotes;
   menu: ReturnType<typeof getMenuMethod>;
   dismissToast: (content: string) => Promise<void>;
@@ -246,6 +295,10 @@ export const test = base.extend<{
   // eslint-disable-next-line no-empty-pattern
   createContact: async ({}, cb) => {
     await cb(createContact);
+  },
+  // eslint-disable-next-line no-empty-pattern
+  createDeal: async ({}, cb) => {
+    await cb(createDeal);
   },
   // eslint-disable-next-line no-empty-pattern
   createNotes: async ({}, cb) => {
